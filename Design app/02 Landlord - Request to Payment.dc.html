@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#EDF0F3;font-family:'Public Sans',system-ui,sans-serif;color:#17222E}
+@keyframes pc-pulse{0%{box-shadow:0 0 0 0 rgba(28,122,67,.45)}70%{box-shadow:0 0 0 7px rgba(28,122,67,0)}100%{box-shadow:0 0 0 0 rgba(28,122,67,0)}}
+</style>
+</helmet>
+
+<section style="padding:48px 56px 72px;display:flex;flex-direction:column;gap:28px" data-screen-label="Landlord — Request to Payment">
+  <div style="max-width:900px">
+    <div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8A96A1">Landlord · flow A · mobile 390</div>
+    <h1 style="margin:6px 0 8px;font-size:26px;font-weight:800;letter-spacing:-0.02em">New request → price approval → tracking → variation → payment</h1>
+    <p style="margin:0;font-size:14px;color:#56646F;line-height:1.55">The fixed price appears at step 4 and never leaves the screen again. Amber = your action needed. The variation screen asks, it doesn't bill.</p>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:44px;align-items:flex-start">
+
+    <!-- ============ 1 · Pick property ============ -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:700;color:#17222E"><span style="font-family:ui-monospace,monospace;background:#17222E;color:#FFFFFF;border-radius:5px;padding:2px 7px;font-size:11px;margin-right:8px">1</span>Pick property</div>
+      <div style="width:390px;border:10px solid #1D242B;border-radius:54px;overflow:hidden;background:#F4F6F8;box-shadow:0 24px 48px rgba(23,34,46,.16);display:flex;flex-direction:column;min-height:820px" data-screen-label="Pick property">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 28px 6px;font-size:14px;font-weight:700"><span>9:41</span><span style="width:22px;height:11px;background:#17222E;border-radius:3px;display:inline-block"></span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 20px 4px">
+          <span style="width:22px;height:22px;display:inline-block;background:#17222E;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/chevron-left.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/chevron-left.svg) center/contain no-repeat"></span>
+          <span style="font-size:13px;font-weight:600;color:#8A96A1;margin-left:auto">Step 1 of 5</span>
+        </div>
+        <div style="padding:8px 20px 20px;display:flex;flex-direction:column;gap:16px;flex:1">
+          <div>
+            <h2 style="margin:0;font-size:24px;font-weight:700;letter-spacing:-0.01em">New request</h2>
+            <p style="margin:4px 0 0;font-size:15px;color:#56646F">Which property needs attention?</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="background:#FFFFFF;border:2px solid #0F4C81;border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;min-height:56px">
+              <div style="width:42px;height:42px;border-radius:10px;background:#E9F0F7;display:flex;align-items:center;justify-content:center"><span style="width:22px;height:22px;display:inline-block;background:#0F4C81;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/home.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/home.svg) center/contain no-repeat"></span></div>
+              <div style="flex:1"><div style="font-size:15px;font-weight:700">Flat 2, 14 Berwick Street</div><div style="font-size:13px;color:#56646F">Soho, London W1F 0PP · Tenant: Priya S.</div></div>
+              <div style="width:22px;height:22px;border-radius:50%;background:#0F4C81;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">✓</div>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;min-height:56px">
+              <div style="width:42px;height:42px;border-radius:10px;background:#F4F6F8;display:flex;align-items:center;justify-content:center"><span style="width:22px;height:22px;display:inline-block;background:#56646F;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/home.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/home.svg) center/contain no-repeat"></span></div>
+              <div style="flex:1"><div style="font-size:15px;font-weight:700">86 Chatsworth Road</div><div style="font-size:13px;color:#56646F">Hackney, London E5 0LS · Tenant: Tom &amp; Ella W.</div></div>
+              <span style="width:20px;height:20px;display:inline-block;background:#C0C8CF;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/chevron-right.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/chevron-right.svg) center/contain no-repeat"></span>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;min-height:56px">
+              <div style="width:42px;height:42px;border-radius:10px;background:#F4F6F8;display:flex;align-items:center;justify-content:center"><span style="width:22px;height:22px;display:inline-block;background:#56646F;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/home.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/home.svg) center/contain no-repeat"></span></div>
+              <div style="flex:1"><div style="font-size:15px;font-weight:700">12b Gipsy Hill</div><div style="font-size:13px;color:#56646F">Crystal Palace, SE19 1QG · Tenant: Marcus O.</div></div>
+              <span style="width:20px;height:20px;display:inline-block;background:#C0C8CF;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/chevron-right.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/chevron-right.svg) center/contain no-repeat"></span>
+            </div>
+            <div style="border:2px dashed #C7CED4;border-radius:12px;padding:14px;display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;color:#0F4C81;font-size:15px;font-weight:700">＋ Add a property</div>
+          </div>
+          <div style="margin-top:auto;background:#0F4C81;color:#FFFFFF;font-size:16px;font-weight:700;min-height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center" style-hover="background:#0C3F6B">Continue</div>
+        </div>
+        <div style="width:134px;height:5px;border-radius:3px;background:#17222E;margin:6px auto 10px"></div>
+      </div>
+    </div>
+
+    <!-- ============ 2 · Category ============ -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:700;color:#17222E"><span style="font-family:ui-monospace,monospace;background:#17222E;color:#FFFFFF;border-radius:5px;padding:2px 7px;font-size:11px;margin-right:8px">2</span>Category</div>
+      <div style="width:390px;border:10px solid #1D242B;border-radius:54px;overflow:hidden;background:#F4F6F8;box-shadow:0 24px 48px rgba(23,34,46,.16);display:flex;flex-direction:column;min-height:820px" data-screen-label="Category">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 28px 6px;font-size:14px;font-weight:700"><span>9:41</span><span style="width:22px;height:11px;background:#17222E;border-radius:3px;display:inline-block"></span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 20px 4px">
+          <span style="width:22px;height:22px;display:inline-block;background:#17222E;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/chevron-left.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/chevron-left.svg) center/contain no-repeat"></span>
+          <span style="font-size:13px;font-weight:600;color:#8A96A1;margin-left:auto">Step 2 of 5</span>
+        </div>
+        <div style="padding:8px 20px 20px;display:flex;flex-direction:column;gap:16px;flex:1">
+          <div>
+            <h2 style="margin:0;font-size:24px;font-weight:700;letter-spacing:-0.01em">What kind of job?</h2>
+            <p style="margin:4px 0 0;font-size:15px;color:#56646F">Flat 2, 14 Berwick Street</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="background:#FFFFFF;border:2px solid #0F4C81;border-radius:14px;padding:18px;display:flex;align-items:center;gap:16px">
+              <div style="width:52px;height:52px;border-radius:12px;background:#E9F0F7;display:flex;align-items:center;justify-content:center"><span style="width:26px;height:26px;display:inline-block;background:#0F4C81;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/droplets.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/droplets.svg) center/contain no-repeat"></span></div>
+              <div style="flex:1"><div style="font-size:17px;font-weight:700">Plumbing</div><div style="font-size:13px;color:#56646F">Taps, leaks, drains, hot water</div></div>
+              <div style="font-size:13px;font-weight:700;color:#0F4C81;white-space:nowrap">from £120</div>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:14px;padding:18px;display:flex;align-items:center;gap:16px">
+              <div style="width:52px;height:52px;border-radius:12px;background:#F4F6F8;display:flex;align-items:center;justify-content:center"><span style="width:26px;height:26px;display:inline-block;background:#56646F;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/zap.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/zap.svg) center/contain no-repeat"></span></div>
+              <div style="flex:1"><div style="font-size:17px;font-weight:700">Electrical</div><div style="font-size:13px;color:#56646F">Sockets, lighting, consumer units</div><div style="display:inline-flex;align-items:center;gap:5px;margin-top:6px;background:#E6F4EB;color:#1C7A43;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px"><span style="width:12px;height:12px;display:inline-block;background:#1C7A43;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/shield-check.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/shield-check.svg) center/contain no-repeat"></span>NICEIC / NAPIT registered only</div></div>
+              <div style="font-size:13px;font-weight:700;color:#56646F;white-space:nowrap">from £140</div>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:14px;padding:18px;display:flex;align-items:center;gap:16px">
+              <div style="width:52px;height:52px;border-radius:12px;background:#F4F6F8;display:flex;align-items:center;justify-content:center"><span style="width:26px;height:26px;display:inline-block;background:#56646F;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/hammer.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/hammer.svg) center/contain no-repeat"></span></div>
+              <div style="flex:1"><div style="font-size:17px;font-weight:700">Handyman</div><div style="font-size:13px;color:#56646F">Doors, locks, fixings, small repairs</div></div>
+              <div style="font-size:13px;font-weight:700;color:#56646F;white-space:nowrap">from £95</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;background:#E9F0F7;border-radius:12px;padding:12px 14px">
+            <span style="width:18px;height:18px;flex:none;display:inline-block;background:#0F4C81;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/lock.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/lock.svg) center/contain no-repeat"></span>
+            <span style="font-size:13px;color:#0F4C81;font-weight:600;line-height:1.4">Every job has a flat, pre-approved price. No hourly rates, no call-out fees.</span>
+          </div>
+          <div style="margin-top:auto;background:#0F4C81;color:#FFFFFF;font-size:16px;font-weight:700;min-height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center">Continue</div>
+        </div>
+        <div style="width:134px;height:5px;border-radius:3px;background:#17222E;margin:6px auto 10px"></div>
+      </div>
+    </div>
+
+    <!-- ============ 3 · Describe ============ -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:700;color:#17222E"><span style="font-family:ui-monospace,monospace;background:#17222E;color:#FFFFFF;border-radius:5px;padding:2px 7px;font-size:11px;margin-right:8px">3</span>Describe the issue</div>
+      <div style="width:390px;border:10px solid #1D242B;border-radius:54px;overflow:hidden;background:#F4F6F8;box-shadow:0 24px 48px rgba(23,34,46,.16);display:flex;flex-direction:column;min-height:820px" data-screen-label="Describe issue">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 28px 6px;font-size:14px;font-weight:700"><span>9:41</span><span style="width:22px;height:11px;background:#17222E;border-radius:3px;display:inline-block"></span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 20px 4px">
+          <span style="width:22px;height:22px;display:inline-block;background:#17222E;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/chevron-left.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/chevron-left.svg) center/contain no-repeat"></span>
+          <span style="font-size:13px;font-weight:600;color:#8A96A1;margin-left:auto">Step 3 of 5</span>
+        </div>
+        <div style="padding:8px 20px 20px;display:flex;flex-direction:column;gap:16px;flex:1">
+          <div>
+            <h2 style="margin:0;font-size:24px;font-weight:700;letter-spacing:-0.01em">What's the problem?</h2>
+            <p style="margin:4px 0 0;font-size:15px;color:#56646F">Plumbing · Flat 2, 14 Berwick Street</p>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#56646F;margin-bottom:8px">Common jobs — fixed prices</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <span style="background:#0F4C81;color:#FFFFFF;font-size:14px;font-weight:600;padding:10px 14px;border-radius:999px">Leaking tap · £180</span>
+              <span style="background:#FFFFFF;border:1px solid #E2E7EC;color:#17222E;font-size:14px;font-weight:600;padding:10px 14px;border-radius:999px">Blocked drain · £160</span>
+              <span style="background:#FFFFFF;border:1px solid #E2E7EC;color:#17222E;font-size:14px;font-weight:600;padding:10px 14px;border-radius:999px">No hot water · £220</span>
+              <span style="background:#FFFFFF;border:1px solid #E2E7EC;color:#17222E;font-size:14px;font-weight:600;padding:10px 14px;border-radius:999px">Something else</span>
+            </div>
+          </div>
+          <div style="background:#FFFFFF;border:1.5px solid #C7CED4;border-radius:12px;padding:14px;min-height:96px;font-size:15px;line-height:1.5;color:#17222E">Kitchen mixer tap has been dripping constantly for a week. Tenant says it's getting worse and the cupboard below is damp.</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#56646F;margin-bottom:8px">Photos help the engineer arrive prepared</div>
+            <div style="display:flex;gap:10px">
+              <div style="width:86px;height:86px;border-radius:10px;background:repeating-linear-gradient(45deg,#E3E8EC,#E3E8EC 6px,#F1F4F6 6px,#F1F4F6 12px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:9px;color:#75828E;text-align:center">tap photo</div>
+              <div style="width:86px;height:86px;border-radius:10px;background:repeating-linear-gradient(45deg,#E3E8EC,#E3E8EC 6px,#F1F4F6 6px,#F1F4F6 12px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:9px;color:#75828E;text-align:center">cupboard photo</div>
+              <div style="width:86px;height:86px;border-radius:10px;border:2px dashed #C7CED4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#0F4C81"><span style="width:22px;height:22px;display:inline-block;background:#0F4C81;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/camera.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/camera.svg) center/contain no-repeat"></span><span style="font-size:11px;font-weight:700">Add</span></div>
+            </div>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px">
+            <div style="flex:1"><div style="font-size:14px;font-weight:700">Tenant provides access</div><div style="font-size:12px;color:#56646F">We'll text Priya a link to pick a slot</div></div>
+            <div style="width:52px;height:31px;border-radius:999px;background:#0F4C81;position:relative;flex:none"><div style="position:absolute;top:3px;right:3px;width:25px;height:25px;border-radius:50%;background:#FFFFFF"></div></div>
+          </div>
+          <div style="margin-top:auto;background:#0F4C81;color:#FFFFFF;font-size:16px;font-weight:700;min-height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center">Continue</div>
+        </div>
+        <div style="width:134px;height:5px;border-radius:3px;background:#17222E;margin:6px auto 10px"></div>
+      </div>
+    </div>
+
+    <!-- ============ 4 · Urgency ============ -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:700;color:#17222E"><span style="font-family:ui-monospace,monospace;background:#17222E;color:#FFFFFF;border-radius:5px;padding:2px 7px;font-size:11px;margin-right:8px">4</span>Urgency</div>
+      <div style="width:390px;border:10px solid #1D242B;border-radius:54px;overflow:hidden;background:#F4F6F8;box-shadow:0 24px 48px rgba(23,34,46,.16);display:flex;flex-direction:column;min-height:820px" data-screen-label="Urgency">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 28px 6px;font-size:14px;font-weight:700"><span>9:41</span><span style="width:22px;height:11px;background:#17222E;border-radius:3px;display:inline-block"></span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 20px 4px">
+          <span style="width:22px;height:22px;display:inline-block;background:#17222E;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/chevron-left.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/chevron-left.svg) center/contain no-repeat"></span>
+          <span style="font-size:13px;font-weight:600;color:#8A96A1;margin-left:auto">Step 4 of 5</span>
+        </div>
+        <div style="padding:8px 20px 20px;display:flex;flex-direction:column;gap:16px;flex:1">
+          <div>
+            <h2 style="margin:0;font-size:24px;font-weight:700;letter-spacing:-0.01em">How urgent is it?</h2>
+            <p style="margin:4px 0 0;font-size:15px;color:#56646F">Leaking tap · Flat 2, 14 Berwick Street</p>
+          </div>
+          <div style="background:#FFFFFF;border:2px solid #0F4C81;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline">
+              <div style="font-size:17px;font-weight:700">Standard</div>
+              <div style="font-size:20px;font-weight:800;font-variant-numeric:tabular-nums">£180.00</div>
+            </div>
+            <div style="font-size:14px;color:#56646F;line-height:1.5">Next available weekday slot — usually within 2 working days. Fixed price, inc. VAT.</div>
+            <div style="display:inline-flex;align-items:center;gap:6px;align-self:flex-start;background:#E9F0F7;color:#0F4C81;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px">Earliest: tomorrow, 10:00–12:00</div>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline">
+              <div style="font-size:17px;font-weight:700">Out-of-hours emergency</div>
+              <div style="font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;color:#56646F">£315.00</div>
+            </div>
+            <div style="font-size:14px;color:#56646F;line-height:1.5">An on-call engineer tonight or this weekend. 1.75× surcharge, still a fixed price.</div>
+            <div style="display:flex;align-items:flex-start;gap:8px;background:#FCF2DE;border-radius:10px;padding:10px 12px">
+              <span style="width:16px;height:16px;flex:none;margin-top:1px;display:inline-block;background:#7A5600;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/triangle-alert.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/triangle-alert.svg) center/contain no-repeat"></span>
+              <span style="font-size:12.5px;color:#7A5600;font-weight:600;line-height:1.45">Best effort — depends on an on-call engineer accepting. You're only charged if one does. If none accepts, we'll show you safe next steps.</span>
+            </div>
+          </div>
+          <div style="margin-top:auto;background:#0F4C81;color:#FFFFFF;font-size:16px;font-weight:700;min-height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center">See your fixed price</div>
+        </div>
+        <div style="width:134px;height:5px;border-radius:3px;background:#17222E;margin:6px auto 10px"></div>
+      </div>
+    </div>
+
+    <!-- ============ 5 · Price approval (HERO) ============ -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:700;color:#0F4C81"><span style="font-family:ui-monospace,monospace;background:#0F4C81;color:#FFFFFF;border-radius:5px;padding:2px 7px;font-size:11px;margin-right:8px">5</span>Price approval — the hero moment</div>
+      <div style="width:390px;border:10px solid #1D242B;border-radius:54px;overflow:hidden;background:#F4F6F8;box-shadow:0 24px 48px rgba(15,76,129,.28);display:flex;flex-direction:column;min-height:820px" data-screen-label="Price approval">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 28px 6px;font-size:14px;font-weight:700"><span>9:41</span><span style="width:22px;height:11px;background:#17222E;border-radius:3px;display:inline-block"></span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 20px 4px">
+          <span style="width:22px;height:22px;display:inline-block;background:#17222E;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/chevron-left.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/chevron-left.svg) center/contain no-repeat"></span>
+          <span style="font-size:13px;font-weight:600;color:#8A96A1;margin-left:auto">Step 5 of 5</span>
+        </div>
+        <div style="padding:8px 20px 20px;display:flex;flex-direction:column;gap:14px;flex:1">
+          <h2 style="margin:0;font-size:24px;font-weight:700;letter-spacing:-0.01em">Your fixed price</h2>
+          <div style="background:#E9F0F7;border:1.5px solid #C6D8E8;border-radius:16px;padding:22px 20px;text-align:center">
+            <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0F4C81"><span style="width:14px;height:14px;display:inline-block;background:#0F4C81;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/lock.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/lock.svg) center/contain no-repeat"></span>Fixed price</div>
+            <div style="font-size:52px;font-weight:800;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;line-height:1.1;margin:4px 0">£180<span style="font-size:30px">.00</span></div>
+            <div style="font-size:13.5px;font-weight:600;color:#56646F">inc. VAT · no call-out fee · this is what you'll pay</div>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:9px">
+            <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="width:17px;height:17px;flex:none;display:inline-block;background:#1C7A43;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/check.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/check.svg) center/contain no-repeat"></span>Repair or replace kitchen mixer tap</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="width:17px;height:17px;flex:none;display:inline-block;background:#1C7A43;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/check.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/check.svg) center/contain no-repeat"></span>All labour + standard parts up to £20</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="width:17px;height:17px;flex:none;display:inline-block;background:#1C7A43;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/check.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/check.svg) center/contain no-repeat"></span>Vetted, insured engineer · 12-month guarantee</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:14px"><span style="width:17px;height:17px;flex:none;display:inline-block;background:#1C7A43;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/check.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/check.svg) center/contain no-repeat"></span>Extra work always needs your OK first</div>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#56646F;margin-bottom:8px">Pick a slot — your tenant confirms access</div>
+            <div style="display:flex;gap:8px">
+              <div style="flex:1;background:#0F4C81;color:#FFFFFF;border-radius:10px;padding:10px 6px;text-align:center"><div style="font-size:13px;font-weight:700">Tue 07/07</div><div style="font-size:12px;opacity:.9">10:00–12:00</div></div>
+              <div style="flex:1;background:#FFFFFF;border:1px solid #E2E7EC;border-radius:10px;padding:10px 6px;text-align:center"><div style="font-size:13px;font-weight:700">Tue 07/07</div><div style="font-size:12px;color:#56646F">14:00–16:00</div></div>
+              <div style="flex:1;background:#FFFFFF;border:1px solid #E2E7EC;border-radius:10px;padding:10px 6px;text-align:center"><div style="font-size:13px;font-weight:700">Wed 08/07</div><div style="font-size:12px;color:#56646F">08:00–10:00</div></div>
+            </div>
+          </div>
+          <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+            <div style="background:#0F4C81;color:#FFFFFF;font-size:17px;font-weight:700;min-height:54px;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(15,76,129,.3)" style-hover="background:#0C3F6B">Approve £180.00 &amp; book</div>
+            <div style="font-size:12px;color:#8A96A1;text-align:center">You pay after the job is done, never before.</div>
+          </div>
+        </div>
+        <div style="width:134px;height:5px;border-radius:3px;background:#17222E;margin:6px auto 10px"></div>
+      </div>
+    </div>
+
+    <!-- ============ 6 · Booked ============ -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:700;color:#17222E"><span style="font-family:ui-monospace,monospace;background:#17222E;color:#FFFFFF;border-radius:5px;padding:2px 7px;font-size:11px;margin-right:8px">6</span>Booked — tracking begins</div>
+      <div style="width:390px;border:10px solid #1D242B;border-radius:54px;overflow:hidden;background:#F4F6F8;box-shadow:0 24px 48px rgba(23,34,46,.16);display:flex;flex-direction:column;min-height:820px" data-screen-label="Booked confirmation">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 28px 6px;font-size:14px;font-weight:700"><span>9:41</span><span style="width:22px;height:11px;background:#17222E;border-radius:3px;display:inline-block"></span></div>
+        <div style="padding:20px 20px;display:flex;flex-direction:column;gap:16px;flex:1">
+          <div style="text-align:center;padding-top:8px">
+            <div style="width:64px;height:64px;border-radius:50%;background:#E6F4EB;display:flex;align-items:center;justify-content:center;margin:0 auto 12px"><span style="width:32px;height:32px;display:inline-block;background:#1C7A43;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/check.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/check.svg) center/contain no-repeat"></span></div>
+            <h2 style="margin:0;font-size:24px;font-weight:700;letter-spacing:-0.01em">Booked</h2>
+            <p style="margin:6px 0 0;font-size:15px;color:#56646F;line-height:1.5">Tue 07/07, 10:00–12:00 · £180.00 fixed<br>We've texted Priya to confirm access.</p>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px">
+            <div style="width:52px;height:52px;border-radius:50%;background:repeating-linear-gradient(45deg,#E3E8EC,#E3E8EC 5px,#F1F4F6 5px,#F1F4F6 10px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:8px;color:#75828E">photo</div>
+            <div style="flex:1">
+              <div style="font-size:15px;font-weight:700">Sam Okafor</div>
+              <div style="font-size:13px;color:#56646F">Plumber · 4.9 ★ · 312 jobs</div>
+              <div style="display:inline-flex;align-items:center;gap:5px;margin-top:5px;background:#E6F4EB;color:#1C7A43;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px"><span style="width:12px;height:12px;display:inline-block;background:#1C7A43;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/shield-check.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/shield-check.svg) center/contain no-repeat"></span>Vetted · insured · DBS checked</div>
+            </div>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:12px;padding:16px">
+            <div style="display:flex;flex-direction:column">
+              <div style="display:flex;gap:14px"><div style="display:flex;flex-direction:column;align-items:center"><div style="width:22px;height:22px;border-radius:50%;background:#1C7A43;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">✓</div><div style="width:2px;flex:1;background:#1C7A43;min-height:14px"></div></div><div style="padding-bottom:12px"><div style="font-size:14px;font-weight:700">Request received</div><div style="font-size:12px;color:#8A96A1">Today, 09:12</div></div></div>
+              <div style="display:flex;gap:14px"><div style="display:flex;flex-direction:column;align-items:center"><div style="width:22px;height:22px;border-radius:50%;background:#1C7A43;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">✓</div><div style="width:2px;flex:1;background:#1C7A43;min-height:14px"></div></div><div style="padding-bottom:12px"><div style="font-size:14px;font-weight:700">Price approved — £180.00</div><div style="font-size:12px;color:#8A96A1">Today, 09:15 · by you</div></div></div>
+              <div style="display:flex;gap:14px"><div style="display:flex;flex-direction:column;align-items:center"><div style="width:22px;height:22px;border-radius:50%;background:#FFFFFF;border:2.5px solid #0F4C81;display:flex;align-items:center;justify-content:center"><div style="width:8px;height:8px;border-radius:50%;background:#0F4C81"></div></div><div style="width:2px;flex:1;background:#E2E7EC;min-height:14px"></div></div><div style="padding-bottom:12px"><div style="font-size:14px;font-weight:700;color:#0F4C81">Booked for Tue 07/07, 10:00–12:00</div><div style="font-size:12px;color:#56646F">Waiting for tenant to confirm access</div></div></div>
+              <div style="display:flex;gap:14px"><div style="display:flex;flex-direction:column;align-items:center"><div style="width:22px;height:22px;border-radius:50%;background:#FFFFFF;border:2px solid #E2E7EC"></div></div><div><div style="font-size:14px;font-weight:600;color:#8A96A1">Job day — live updates here</div><div style="font-size:12px;color:#C0C8CF">You won't need to call anyone</div></div></div>
+            </div>
+          </div>
+          <div style="margin-top:auto;background:#FFFFFF;color:#0F4C81;border:1.5px solid #0F4C81;font-size:15px;font-weight:700;min-height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center">Back to home</div>
+        </div>
+        <div style="width:134px;height:5px;border-radius:3px;background:#17222E;margin:6px auto 10px"></div>
+      </div>
+    </div>
+
+    <!-- ============ 7 · Variation approval ============ -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:700;color:#7A5600"><span style="font-family:ui-monospace,monospace;background:#7A5600;color:#FFFFFF;border-radius:5px;padding:2px 7px;font-size:11px;margin-right:8px">7</span>Variation approval — being asked, not billed</div>
+      <div style="width:390px;border:10px solid #1D242B;border-radius:54px;overflow:hidden;background:#F4F6F8;box-shadow:0 24px 48px rgba(23,34,46,.16);display:flex;flex-direction:column;min-height:820px" data-screen-label="Variation approval">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 28px 6px;font-size:14px;font-weight:700"><span>11:32</span><span style="width:22px;height:11px;background:#17222E;border-radius:3px;display:inline-block"></span></div>
+        <div style="margin:8px 16px 0;background:#FFFFFF;border:1px solid #E2E7EC;border-radius:14px;padding:12px 14px;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px rgba(23,34,46,.12)">
+          <div style="width:34px;height:34px;border-radius:8px;background:#0F4C81;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex:none">PC</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:700">Extra work needs your OK</div><div style="font-size:12px;color:#56646F">Sam found a seized isolator valve — review before he continues</div></div>
+          <div style="font-size:11px;color:#8A96A1;align-self:flex-start">now</div>
+        </div>
+        <div style="padding:16px 20px 20px;display:flex;flex-direction:column;gap:14px;flex:1">
+          <div>
+            <span style="display:inline-flex;align-items:center;gap:7px;background:#FCF2DE;color:#7A5600;font-size:13px;font-weight:600;padding:5px 12px;border-radius:999px"><span style="width:7px;height:7px;border-radius:50%;background:#B98200"></span>Waiting for your approval — job paused</span>
+            <h2 style="margin:10px 0 4px;font-size:22px;font-weight:700;letter-spacing:-0.01em">Sam found extra work</h2>
+            <p style="margin:0;font-size:14px;color:#56646F;line-height:1.5">"The isolator valve under the sink is seized and needs replacing before I can fit the new tap. Photos below."</p>
+          </div>
+          <div style="display:flex;gap:10px">
+            <div style="flex:1;height:110px;border-radius:10px;background:repeating-linear-gradient(45deg,#E3E8EC,#E3E8EC 6px,#F1F4F6 6px,#F1F4F6 12px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:9px;color:#75828E">valve photo 1</div>
+            <div style="flex:1;height:110px;border-radius:10px;background:repeating-linear-gradient(45deg,#E3E8EC,#E3E8EC 6px,#F1F4F6 6px,#F1F4F6 12px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:9px;color:#75828E">valve photo 2</div>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:14px;color:#56646F">Original fixed price</span><span style="font-size:16px;font-weight:600;color:#8A96A1;text-decoration:line-through;font-variant-numeric:tabular-nums">£180.00</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:14px;color:#56646F">Replace isolator valve (parts + labour)</span><span style="font-size:15px;font-weight:600;font-variant-numeric:tabular-nums">+£65.00</span></div>
+            <div style="border-top:1px solid #E2E7EC;padding-top:10px;display:flex;justify-content:space-between;align-items:baseline">
+              <span style="display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:#0F4C81"><span style="width:14px;height:14px;display:inline-block;background:#0F4C81;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/lock.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/lock.svg) center/contain no-repeat"></span>New fixed price</span>
+              <span style="font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-0.02em">£245.00</span>
+            </div>
+            <div style="font-size:12px;color:#8A96A1;text-align:right;margin-top:-6px">inc. VAT · checked by PropCare before reaching you</div>
+          </div>
+          <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+            <div style="background:#0F4C81;color:#FFFFFF;font-size:16px;font-weight:700;min-height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center">Approve new price — £245.00</div>
+            <div style="background:#FFFFFF;color:#B3261E;border:1.5px solid #ECC9C7;font-size:15px;font-weight:700;min-height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center">Decline extra work</div>
+            <div style="font-size:12px;color:#8A96A1;text-align:center;line-height:1.5">Declining pauses the job — the new tap can't be fitted while the valve is seized. You won't be charged; we'll call you to rearrange or cancel.</div>
+          </div>
+        </div>
+        <div style="width:134px;height:5px;border-radius:3px;background:#17222E;margin:6px auto 10px"></div>
+      </div>
+    </div>
+
+    <!-- ============ 8 · Completion & payment ============ -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:13px;font-weight:700;color:#17222E"><span style="font-family:ui-monospace,monospace;background:#17222E;color:#FFFFFF;border-radius:5px;padding:2px 7px;font-size:11px;margin-right:8px">8</span>Completion &amp; payment</div>
+      <div style="width:390px;border:10px solid #1D242B;border-radius:54px;overflow:hidden;background:#F4F6F8;box-shadow:0 24px 48px rgba(23,34,46,.16);display:flex;flex-direction:column;min-height:820px" data-screen-label="Completion and payment">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 28px 6px;font-size:14px;font-weight:700"><span>14:05</span><span style="width:22px;height:11px;background:#17222E;border-radius:3px;display:inline-block"></span></div>
+        <div style="padding:14px 20px 20px;display:flex;flex-direction:column;gap:14px;flex:1">
+          <div>
+            <span style="display:inline-flex;align-items:center;gap:7px;background:#E6F4EB;color:#1C7A43;font-size:13px;font-weight:600;padding:5px 12px;border-radius:999px"><span style="width:7px;height:7px;border-radius:50%;background:#1C7A43"></span>Work completed</span>
+            <h2 style="margin:10px 0 4px;font-size:22px;font-weight:700;letter-spacing:-0.01em">Sam's finished — take a look</h2>
+            <p style="margin:0;font-size:14px;color:#56646F">New tap + isolator valve fitted · finished 13:48</p>
+          </div>
+          <div style="display:flex;gap:10px">
+            <div style="flex:1"><div style="height:104px;border-radius:10px;background:repeating-linear-gradient(45deg,#E3E8EC,#E3E8EC 6px,#F1F4F6 6px,#F1F4F6 12px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:9px;color:#75828E">before</div><div style="font-size:11px;font-weight:700;color:#8A96A1;text-align:center;margin-top:4px">BEFORE</div></div>
+            <div style="flex:1"><div style="height:104px;border-radius:10px;background:repeating-linear-gradient(45deg,#DEEAE1,#DEEAE1 6px,#EFF6F0 6px,#EFF6F0 12px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:9px;color:#5B7A64">after</div><div style="font-size:11px;font-weight:700;color:#1C7A43;text-align:center;margin-top:4px">AFTER</div></div>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:12px;padding:16px;text-align:center">
+            <div style="font-size:14px;font-weight:700;margin-bottom:8px">How did Sam do?</div>
+            <div><span style="font-size:34px;color:#E8A33D;letter-spacing:6px">★★★★★</span></div>
+            <div style="border:1.5px solid #E2E7EC;border-radius:10px;padding:11px 12px;font-size:14px;color:#8A96A1;text-align:left;margin-top:10px">Add a comment (optional)</div>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;font-size:14px;color:#56646F"><span>Invoice #PC-2041</span><span>Tue 07/07/2026</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:15px;font-weight:700">Total — as approved</span><span style="font-size:26px;font-weight:800;font-variant-numeric:tabular-nums">£245.00</span></div>
+            <div style="font-size:12px;color:#8A96A1;text-align:right;margin-top:-4px">inc. VAT · £180.00 job + £65.00 approved variation</div>
+          </div>
+          <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+            <div style="background:#0F4C81;color:#FFFFFF;font-size:16px;font-weight:700;min-height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px"><span style="width:18px;height:18px;display:inline-block;background:#FFFFFF;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/credit-card.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/credit-card.svg) center/contain no-repeat"></span>Confirm &amp; pay £245.00</div>
+            <div style="font-size:12px;color:#8A96A1;text-align:center;line-height:1.5">Secure card payment via Stripe. If you don't confirm, the job auto-confirms in 72 hours — we'll remind you first.</div>
+          </div>
+        </div>
+        <div style="width:134px;height:5px;border-radius:3px;background:#17222E;margin:6px auto 10px"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</x-dc>
+</body>
+</html>

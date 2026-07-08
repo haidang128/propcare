@@ -1,0 +1,38 @@
+{
+  "cli": {
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://psmdiezvrnfafqqknyth.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzbWRpZXp2cm5mYWZxcWtueXRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMjUwMDksImV4cCI6MjA5ODgwMTAwOX0.1ofM8clPSFFEdiZ-cI_uXHakFMNTGzcOdVm3HImrXq0",
+        "EXPO_PUBLIC_APP_URL": "https://propcare.expo.app"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://psmdiezvrnfafqqknyth.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzbWRpZXp2cm5mYWZxcWtueXRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMjUwMDksImV4cCI6MjA5ODgwMTAwOX0.1ofM8clPSFFEdiZ-cI_uXHakFMNTGzcOdVm3HImrXq0",
+        "EXPO_PUBLIC_APP_URL": "https://propcare.expo.app"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://psmdiezvrnfafqqknyth.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzbWRpZXp2cm5mYWZxcWtueXRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMjUwMDksImV4cCI6MjA5ODgwMTAwOX0.1ofM8clPSFFEdiZ-cI_uXHakFMNTGzcOdVm3HImrXq0",
+        "EXPO_PUBLIC_APP_URL": "https://propcare.expo.app"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

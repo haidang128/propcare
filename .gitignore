@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Expo / build output
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+*.tsbuildinfo
+
+# Environment / secrets (values are recoverable from *.env.example + Supabase/Stripe dashboards)
+.env
+.env.*
+!.env.example
+*.pem
+*.p8
+*.p12
+*.key
+*.jks
+*.mobileprovision
+
+# Logs / debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local Claude settings (machine-specific permissions)
+.claude/settings.local.json
+
+# Scratch
+*.orig.*

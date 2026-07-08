@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#EDF0F3;font-family:'Public Sans',system-ui,sans-serif;color:#17222E}
+@keyframes pc-pulse{0%{box-shadow:0 0 0 0 rgba(28,122,67,.45)}70%{box-shadow:0 0 0 7px rgba(28,122,67,0)}100%{box-shadow:0 0 0 0 rgba(28,122,67,0)}}
+</style>
+</helmet>
+
+<section style="padding:48px 56px 72px;display:flex;flex-direction:column;gap:36px" data-screen-label="Admin Dashboard">
+  <div style="max-width:900px">
+    <div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8A96A1">Admin · web desktop 1360</div>
+    <h1 style="margin:6px 0 8px;font-size:26px;font-weight:800;letter-spacing:-0.02em">Dispatch, variation review, rate card, technician registry</h1>
+    <p style="margin:0;font-size:14px;color:#56646F;line-height:1.55">The dispatcher's cockpit. Amber queue = money decisions; certification blocks are enforced in the UI, not just policy.</p>
+  </div>
+
+  <!-- ============ A1 Dispatch board ============ -->
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:700;color:#17222E"><span style="font-family:ui-monospace,monospace;background:#17222E;color:#FFFFFF;border-radius:5px;padding:2px 7px;font-size:11px;margin-right:8px">A1</span>Dispatch board</div>
+    <div style="width:1360px;background:#F4F6F8;border:1px solid #D8DEE4;border-radius:14px;overflow:hidden;box-shadow:0 24px 48px rgba(23,34,46,.12)" data-screen-label="Dispatch board">
+      <div style="background:#FFFFFF;border-bottom:1px solid #E2E7EC;display:flex;align-items:center;gap:8px;padding:10px 16px">
+        <span style="width:11px;height:11px;border-radius:50%;background:#E2E7EC"></span><span style="width:11px;height:11px;border-radius:50%;background:#E2E7EC"></span><span style="width:11px;height:11px;border-radius:50%;background:#E2E7EC"></span>
+        <span style="margin-left:14px;background:#F1F4F6;border-radius:8px;padding:5px 14px;font-size:12px;color:#56646F;font-family:ui-monospace,monospace">ops.propcare.uk/dispatch</span>
+      </div>
+      <div style="display:flex;min-height:780px">
+        <div style="width:216px;background:#0F2C4A;color:#FFFFFF;display:flex;flex-direction:column;padding:20px 14px;gap:4px;flex:none">
+          <div style="font-size:18px;font-weight:800;letter-spacing:-0.02em;padding:0 10px 18px">PropCare <span style="font-weight:400;opacity:.7">Ops</span></div>
+          <div style="background:rgba(255,255,255,.14);border-radius:9px;padding:10px 12px;font-size:14px;font-weight:700;display:flex;justify-content:space-between;align-items:center">Dispatch <span style="background:#E8A33D;color:#17222E;font-size:11px;font-weight:800;border-radius:999px;padding:1px 8px">4</span></div>
+          <div style="border-radius:9px;padding:10px 12px;font-size:14px;font-weight:600;opacity:.75;display:flex;justify-content:space-between;align-items:center">Variations <span style="background:#E8A33D;color:#17222E;font-size:11px;font-weight:800;border-radius:999px;padding:1px 8px">3</span></div>
+          <div style="border-radius:9px;padding:10px 12px;font-size:14px;font-weight:600;opacity:.75">Rate card</div>
+          <div style="border-radius:9px;padding:10px 12px;font-size:14px;font-weight:600;opacity:.75">Technicians</div>
+          <div style="margin-top:auto;border-top:1px solid rgba(255,255,255,.15);padding:14px 12px 0;font-size:13px;opacity:.75">Dispatcher · Ade B.</div>
+        </div>
+        <div style="flex:1;padding:24px 28px;display:flex;gap:24px;overflow:hidden">
+          <!-- Incoming -->
+          <div style="width:400px;flex:none;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:17px;font-weight:800">Incoming requests</span><span style="font-size:12.5px;color:#8A96A1;font-weight:600">oldest first</span></div>
+            <div style="background:#FFFFFF;border:1px solid #ECC98A;border-left:4px solid #E8A33D;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div><div style="font-size:14.5px;font-weight:700">EMERGENCY · Burst pipe under sink</div><div style="font-size:12.5px;color:#56646F">3 Maltby St, SE1 3PA · J. Whitfield · 07:56</div></div>
+                <span style="font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap">£315.00</span>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <span style="display:inline-flex;align-items:center;gap:6px;background:#FCF2DE;color:#7A5600;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px">Out-of-hours · ×1.75</span>
+                <span style="font-size:12px;color:#B3261E;font-weight:700">Waiting since 07:56 — 2 on-call plumbers pinged</span>
+              </div>
+              <div style="display:flex;gap:8px">
+                <div style="flex:1;background:#0F4C81;color:#FFFFFF;font-size:13px;font-weight:700;min-height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center">Assign manually</div>
+                <div style="flex:1;background:#FFFFFF;border:1.5px solid #E2E7EC;color:#56646F;font-size:13px;font-weight:700;min-height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center">Trigger fallback</div>
+              </div>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div><div style="font-size:14.5px;font-weight:700">Socket not working — bedroom</div><div style="font-size:12.5px;color:#56646F">86 Chatsworth Rd, E5 · J. Hart · 09:02</div></div>
+                <span style="font-size:14px;font-weight:800;font-variant-numeric:tabular-nums">£140.00</span>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <span style="display:inline-flex;align-items:center;gap:6px;background:#E9F0F7;color:#0F4C81;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px">Electrical</span>
+                <span style="display:inline-flex;align-items:center;gap:5px;background:#E6F4EB;color:#1C7A43;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px">Needs NICEIC/NAPIT</span>
+              </div>
+              <div style="background:#0F4C81;color:#FFFFFF;font-size:13px;font-weight:700;min-height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center">Assign → 2 eligible</div>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div><div style="font-size:14.5px;font-weight:700">Sticking front door</div><div style="font-size:12.5px;color:#56646F">12b Gipsy Hill, SE19 · M. Osei · 08:44</div></div>
+                <span style="font-size:14px;font-weight:800;font-variant-numeric:tabular-nums">£95.00</span>
+              </div>
+              <span style="display:inline-flex;align-self:flex-start;background:#EEF1F4;color:#4A5560;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px">Handyman</span>
+              <div style="background:#0F4C81;color:#FFFFFF;font-size:13px;font-weight:700;min-height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center">Assign → 5 eligible</div>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-size:14.5px;font-weight:700">Dripping bath tap</div><div style="font-size:12.5px;color:#56646F">40 Askew Rd, W12 · S. Nair · 08:31</div></div>
+              <span style="font-size:14px;font-weight:800;font-variant-numeric:tabular-nums">£180.00</span>
+            </div>
+          </div>
+          <!-- Capacity -->
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:17px;font-weight:800">Technicians — today</span><span style="font-size:12.5px;color:#8A96A1;font-weight:600">utilisation of an 8-hour day</span></div>
+            <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;align-items:center;gap:14px">
+                <div style="width:150px;flex:none;display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:50%;background:repeating-linear-gradient(45deg,#E3E8EC,#E3E8EC 5px,#F1F4F6 5px,#F1F4F6 10px)"></div><div><div style="font-size:13.5px;font-weight:700">Sam O.</div><div style="font-size:11px;color:#8A96A1">Plumbing</div></div></div>
+                <div style="flex:1;height:26px;background:#F1F4F6;border-radius:7px;overflow:hidden;display:flex">
+                  <div style="width:26%;background:#1C7A43;border-radius:7px 0 0 7px;display:flex;align-items:center;justify-content:center;color:#FFFFFF;font-size:10.5px;font-weight:700">Berwick St · live</div>
+                  <div style="width:24%;background:#5D89B0;display:flex;align-items:center;justify-content:center;color:#FFFFFF;font-size:10.5px;font-weight:700">Fournier St</div>
+                  <div style="width:22%;background:#9CC4E8;display:flex;align-items:center;justify-content:center;color:#0C2036;font-size:10.5px;font-weight:700">Cloudesley Sq</div>
+                </div>
+                <span style="width:56px;text-align:right;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;color:#B3261E">72%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:14px">
+                <div style="width:150px;flex:none;display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:50%;background:repeating-linear-gradient(45deg,#E3E8EC,#E3E8EC 5px,#F1F4F6 5px,#F1F4F6 10px)"></div><div><div style="font-size:13.5px;font-weight:700">Lena K.</div><div style="font-size:11px;color:#8A96A1">Electrical · NICEIC</div></div></div>
+                <div style="flex:1;height:26px;background:#F1F4F6;border-radius:7px;overflow:hidden;display:flex">
+                  <div style="width:28%;background:#5D89B0;border-radius:7px 0 0 7px;display:flex;align-items:center;justify-content:center;color:#FFFFFF;font-size:10.5px;font-weight:700">Dalston Ln</div>
+                </div>
+                <span style="width:56px;text-align:right;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;color:#1C7A43">28%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:14px">
+                <div style="width:150px;flex:none;display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:50%;background:repeating-linear-gradient(45deg,#E3E8EC,#E3E8EC 5px,#F1F4F6 5px,#F1F4F6 10px)"></div><div><div style="font-size:13.5px;font-weight:700">Dev P.</div><div style="font-size:11px;color:#8A96A1">Plumbing · Gas Safe</div></div></div>
+                <div style="flex:1;height:26px;background:#F1F4F6;border-radius:7px;overflow:hidden;display:flex">
+                  <div style="width:24%;background:#5D89B0;border-radius:7px 0 0 7px;display:flex;align-items:center;justify-content:center;color:#FFFFFF;font-size:10.5px;font-weight:700">Peckham Rye</div>
+                  <div style="width:26%;background:#9CC4E8;display:flex;align-items:center;justify-content:center;color:#0C2036;font-size:10.5px;font-weight:700">Nunhead Ln</div>
+                </div>
+                <span style="width:56px;text-align:right;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;color:#7A5600">50%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:14px">
+                <div style="width:150px;flex:none;display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:50%;background:repeating-linear-gradient(45deg,#E3E8EC,#E3E8EC 5px,#F1F4F6 5px,#F1F4F6 10px)"></div><div><div style="font-size:13.5px;font-weight:700">Marco T.</div><div style="font-size:11px;color:#8A96A1">Handyman</div></div></div>
+                <div style="flex:1;height:26px;background:#F1F4F6;border-radius:7px;overflow:hidden"></div>
+                <span style="width:56px;text-align:right;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;color:#1C7A43">0%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:14px;opacity:.55">
+                <div style="width:150px;flex:none;display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:50%;background:repeating-linear-gradient(45deg,#E3E8EC,#E3E8EC 5px,#F1F4F6 5px,#F1F4F6 10px)"></div><div><div style="font-size:13.5px;font-weight:700">Ana R.</div><div style="font-size:11px;color:#8A96A1">Electrical · NAPIT</div></div></div>
+                <div style="flex:1;height:26px;background:#F1F4F6;border-radius:7px;display:flex;align-items:center;padding:0 12px;font-size:11px;color:#8A96A1;font-weight:700">Off today — back Wed 08/07</div>
+                <span style="width:56px;text-align:right;font-size:13px;font-weight:800;color:#8A96A1">—</span>
+              </div>
+            </div>
+            <!-- Assign popover demo -->
+            <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:12px;padding:16px 18px;box-shadow:0 12px 32px rgba(23,34,46,.14);width:420px;align-self:flex-end">
+              <div style="font-size:13px;font-weight:800;margin-bottom:4px">Assign: Socket not working — Electrical</div>
+              <div style="font-size:12px;color:#8A96A1;margin-bottom:12px">Only certified electricians can take this job.</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="border:2px solid #0F4C81;border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center"><div><span style="font-size:13.5px;font-weight:700">Lena K.</span> <span style="font-size:11.5px;color:#1C7A43;font-weight:700">NICEIC · free from 13:00</span></div><div style="width:20px;height:20px;border-radius:50%;background:#0F4C81;color:#FFFFFF;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">✓</div></div>
+                <div style="border:1.5px solid #E2E7EC;border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center"><div><span style="font-size:13.5px;font-weight:700">Ana R.</span> <span style="font-size:11.5px;color:#8A96A1;font-weight:600">NAPIT · off today</span></div></div>
+                <div style="border:1.5px solid #EEF1F4;border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;background:#FAFBFC">
+                  <div><span style="font-size:13.5px;font-weight:700;color:#A9B3BC">Sam O.</span> <span style="font-size:11.5px;color:#B3261E;font-weight:700">Blocked — no electrical certification</span></div>
+                  <span style="width:16px;height:16px;display:inline-block;background:#B3261E;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/lock.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/lock.svg) center/contain no-repeat"></span>
+                </div>
+              </div>
+              <div style="margin-top:12px;background:#0F4C81;color:#FFFFFF;font-size:13.5px;font-weight:700;min-height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center">Assign to Lena K.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ A2 Variation review ============ -->
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:700;color:#7A5600"><span style="font-family:ui-monospace,monospace;background:#7A5600;color:#FFFFFF;border-radius:5px;padding:2px 7px;font-size:11px;margin-right:8px">A2</span>Variation review queue</div>
+    <div style="width:1360px;background:#F4F6F8;border:1px solid #D8DEE4;border-radius:14px;overflow:hidden;box-shadow:0 24px 48px rgba(23,34,46,.12)" data-screen-label="Variation review queue">
+      <div style="background:#FFFFFF;border-bottom:1px solid #E2E7EC;display:flex;align-items:center;gap:8px;padding:10px 16px">
+        <span style="width:11px;height:11px;border-radius:50%;background:#E2E7EC"></span><span style="width:11px;height:11px;border-radius:50%;background:#E2E7EC"></span><span style="width:11px;height:11px;border-radius:50%;background:#E2E7EC"></span>
+        <span style="margin-left:14px;background:#F1F4F6;border-radius:8px;padding:5px 14px;font-size:12px;color:#56646F;font-family:ui-monospace,monospace">ops.propcare.uk/variations</span>
+      </div>
+      <div style="display:flex;min-height:700px">
+        <div style="width:216px;background:#0F2C4A;color:#FFFFFF;display:flex;flex-direction:column;padding:20px 14px;gap:4px;flex:none">
+          <div style="font-size:18px;font-weight:800;letter-spacing:-0.02em;padding:0 10px 18px">PropCare <span style="font-weight:400;opacity:.7">Ops</span></div>
+          <div style="border-radius:9px;padding:10px 12px;font-size:14px;font-weight:600;opacity:.75;display:flex;justify-content:space-between;align-items:center">Dispatch <span style="background:#E8A33D;color:#17222E;font-size:11px;font-weight:800;border-radius:999px;padding:1px 8px">4</span></div>
+          <div style="background:rgba(255,255,255,.14);border-radius:9px;padding:10px 12px;font-size:14px;font-weight:700;display:flex;justify-content:space-between;align-items:center">Variations <span style="background:#E8A33D;color:#17222E;font-size:11px;font-weight:800;border-radius:999px;padding:1px 8px">3</span></div>
+          <div style="border-radius:9px;padding:10px 12px;font-size:14px;font-weight:600;opacity:.75">Rate card</div>
+          <div style="border-radius:9px;padding:10px 12px;font-size:14px;font-weight:600;opacity:.75">Technicians</div>
+        </div>
+        <div style="width:360px;flex:none;border-right:1px solid #E2E7EC;background:#FFFFFF;padding:20px 16px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:16px;font-weight:800;padding:0 4px">Pending — 3</div>
+          <div style="border:2px solid #E8A33D;background:#FDF9F0;border-radius:12px;padding:13px 14px">
+            <div style="display:flex;justify-content:space-between"><span style="font-size:14px;font-weight:700">Seized isolator valve</span><span style="font-size:12px;color:#7A5600;font-weight:700">11:26 · 6 min</span></div>
+            <div style="font-size:12.5px;color:#56646F;margin-top:2px">Sam O. · Leaking tap · Berwick St · job paused</div>
+          </div>
+          <div style="border:1px solid #E2E7EC;border-radius:12px;padding:13px 14px">
+            <div style="display:flex;justify-content:space-between"><span style="font-size:14px;font-weight:700">Corroded waste pipe</span><span style="font-size:12px;color:#8A96A1;font-weight:600">10:58</span></div>
+            <div style="font-size:12.5px;color:#56646F;margin-top:2px">Dev P. · Blocked drain · Peckham Rye</div>
+          </div>
+          <div style="border:1px solid #E2E7EC;border-radius:12px;padding:13px 14px">
+            <div style="display:flex;justify-content:space-between"><span style="font-size:14px;font-weight:700">Extra double socket</span><span style="font-size:12px;color:#8A96A1;font-weight:600">10:12</span></div>
+            <div style="font-size:12.5px;color:#56646F;margin-top:2px">Lena K. · Socket repair · Dalston Ln</div>
+          </div>
+        </div>
+        <div style="flex:1;padding:24px 28px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <span style="display:inline-flex;align-items:center;gap:7px;background:#FCF2DE;color:#7A5600;font-size:12.5px;font-weight:700;padding:5px 12px;border-radius:999px"><span style="width:7px;height:7px;border-radius:50%;background:#B98200"></span>Job paused — Sam is waiting on site</span>
+              <h2 style="margin:10px 0 2px;font-size:22px;font-weight:800;letter-spacing:-0.01em">Seized isolator valve</h2>
+              <div style="font-size:13.5px;color:#56646F">#PC-2041 · Leaking kitchen tap · Flat 2, 14 Berwick St · Landlord: J. Hart</div>
+            </div>
+            <div style="text-align:right"><div style="font-size:12px;color:#8A96A1;font-weight:600">original fixed price</div><div style="font-size:20px;font-weight:800;font-variant-numeric:tabular-nums">£180.00</div></div>
+          </div>
+          <div style="display:flex;gap:14px">
+            <div style="width:210px;height:140px;border-radius:12px;background:repeating-linear-gradient(45deg,#E3E8EC,#E3E8EC 6px,#F1F4F6 6px,#F1F4F6 12px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:10px;color:#75828E">valve photo 1</div>
+            <div style="width:210px;height:140px;border-radius:12px;background:repeating-linear-gradient(45deg,#E3E8EC,#E3E8EC 6px,#F1F4F6 6px,#F1F4F6 12px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:10px;color:#75828E">valve photo 2</div>
+            <div style="flex:1;background:#FFFFFF;border:1px solid #E2E7EC;border-radius:12px;padding:14px 16px">
+              <div style="font-size:12px;font-weight:700;color:#8A96A1;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Sam's note · dictated 11:26</div>
+              <div style="font-size:14.5px;line-height:1.55">"Isolator valve seized, needs replacing before new tap goes in. Est. +1 hour."</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:14px">
+            <div style="flex:1;background:#FFFFFF;border:1px solid #E2E7EC;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:9px">
+              <div style="font-size:13px;font-weight:800">Price the variation</div>
+              <div style="display:flex;justify-content:space-between;font-size:13.5px;align-items:center"><span style="color:#56646F">Suggested (rate card: valve swap)</span><span style="font-weight:700;font-variant-numeric:tabular-nums">£60.00</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13.5px;color:#56646F">Your price (inc. VAT)</span><div style="border:2px solid #0F4C81;border-radius:9px;padding:8px 14px;font-size:17px;font-weight:800;font-variant-numeric:tabular-nums;background:#FFFFFF">£65.00</div></div>
+              <div style="font-size:12px;color:#8A96A1;line-height:1.5">Margin check: parts ~£18 + 1h labour — 43% margin ✓</div>
+            </div>
+            <div style="flex:1;background:#E9F0F7;border:1.5px solid #C6D8E8;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:13px;font-weight:800;color:#0F4C81">What the landlord will see</div>
+              <div style="display:flex;justify-content:space-between;font-size:13.5px"><span style="color:#56646F">Original fixed price</span><span style="color:#8A96A1;text-decoration:line-through;font-weight:600;font-variant-numeric:tabular-nums">£180.00</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13.5px"><span style="color:#56646F">Replace isolator valve</span><span style="font-weight:700;font-variant-numeric:tabular-nums">+£65.00</span></div>
+              <div style="display:flex;justify-content:space-between;border-top:1px solid #C6D8E8;padding-top:6px"><span style="font-size:13.5px;font-weight:800;color:#0F4C81">New fixed price</span><span style="font-size:20px;font-weight:800;font-variant-numeric:tabular-nums">£245.00</span></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:auto">
+            <div style="background:#0F4C81;color:#FFFFFF;font-size:14.5px;font-weight:700;min-height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 26px">Approve &amp; send to landlord</div>
+            <div style="background:#FFFFFF;border:1.5px solid #E2E7EC;color:#56646F;font-size:14.5px;font-weight:700;min-height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 20px">Ask Sam for more info</div>
+            <div style="color:#B3261E;font-size:14.5px;font-weight:700;min-height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 20px">Reject variation</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ A3 Rate card ============ -->
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:700;color:#17222E"><span style="font-family:ui-monospace,monospace;background:#17222E;color:#FFFFFF;border-radius:5px;padding:2px 7px;font-size:11px;margin-right:8px">A3</span>Rate card manager</div>
+    <div style="width:1360px;background:#F4F6F8;border:1px solid #D8DEE4;border-radius:14px;overflow:hidden;box-shadow:0 24px 48px rgba(23,34,46,.12)" data-screen-label="Rate card manager">
+      <div style="background:#FFFFFF;border-bottom:1px solid #E2E7EC;display:flex;align-items:center;gap:8px;padding:10px 16px">
+        <span style="width:11px;height:11px;border-radius:50%;background:#E2E7EC"></span><span style="width:11px;height:11px;border-radius:50%;background:#E2E7EC"></span><span style="width:11px;height:11px;border-radius:50%;background:#E2E7EC"></span>
+        <span style="margin-left:14px;background:#F1F4F6;border-radius:8px;padding:5px 14px;font-size:12px;color:#56646F;font-family:ui-monospace,monospace">ops.propcare.uk/rates</span>
+      </div>
+      <div style="display:flex;min-height:640px">
+        <div style="width:216px;background:#0F2C4A;color:#FFFFFF;display:flex;flex-direction:column;padding:20px 14px;gap:4px;flex:none">
+          <div style="font-size:18px;font-weight:800;letter-spacing:-0.02em;padding:0 10px 18px">PropCare <span style="font-weight:400;opacity:.7">Ops</span></div>
+          <div style="border-radius:9px;padding:10px 12px;font-size:14px;font-weight:600;opacity:.75">Dispatch</div>
+          <div style="border-radius:9px;padding:10px 12px;font-size:14px;font-weight:600;opacity:.75">Variations</div>
+          <div style="background:rgba(255,255,255,.14);border-radius:9px;padding:10px 12px;font-size:14px;font-weight:700">Rate card</div>
+          <div style="border-radius:9px;padding:10px 12px;font-size:14px;font-weight:600;opacity:.75">Technicians</div>
+        </div>
+        <div style="flex:1;padding:24px 28px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><h2 style="margin:0;font-size:22px;font-weight:800;letter-spacing:-0.01em">Rate card</h2><div style="font-size:13px;color:#56646F;margin-top:2px">Flat prices shown to landlords · last published 01/07/2026</div></div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:10px;padding:10px 16px;font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:10px">Out-of-hours multiplier <span style="border:2px solid #0F4C81;border-radius:8px;padding:4px 12px;font-size:15px;font-weight:800;font-variant-numeric:tabular-nums">×1.75</span></div>
+              <div style="background:#0F4C81;color:#FFFFFF;font-size:13.5px;font-weight:700;min-height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 20px">Publish changes</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <span style="background:#0F4C81;color:#FFFFFF;font-size:13px;font-weight:700;padding:8px 16px;border-radius:999px">Plumbing · 8</span>
+            <span style="background:#FFFFFF;border:1px solid #E2E7EC;color:#56646F;font-size:13px;font-weight:600;padding:8px 16px;border-radius:999px">Electrical · 7</span>
+            <span style="background:#FFFFFF;border:1px solid #E2E7EC;color:#56646F;font-size:13px;font-weight:600;padding:8px 16px;border-radius:999px">Handyman · 9</span>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:12px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 1.2fr .7fr;padding:12px 18px;background:#F8FAFB;border-bottom:1px solid #E2E7EC;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#8A96A1">
+              <span>Job type</span><span>Ex VAT</span><span>Inc VAT</span><span>Out-of-hours</span><span>Jobs · 90 days</span><span></span>
+            </div>
+            <div style="display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 1.2fr .7fr;padding:13px 18px;border-bottom:1px solid #EEF1F4;font-size:14px;align-items:center">
+              <span style="font-weight:700">Leaking / dripping tap</span><span style="font-variant-numeric:tabular-nums">£150.00</span><span style="font-weight:700;font-variant-numeric:tabular-nums">£180.00</span><span style="font-variant-numeric:tabular-nums;color:#56646F">£315.00</span><span style="color:#56646F">64 · avg 1.2h</span><span style="color:#0F4C81;font-weight:700;font-size:13px">Edit</span>
+            </div>
+            <div style="display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 1.2fr .7fr;padding:13px 18px;border-bottom:1px solid #EEF1F4;font-size:14px;align-items:center;background:#F3F7FB">
+              <span style="font-weight:700">Blocked drain / waste</span>
+              <span><span style="border:2px solid #0F4C81;border-radius:8px;padding:5px 10px;font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;background:#FFFFFF">£133.33</span></span>
+              <span style="font-weight:800;font-variant-numeric:tabular-nums">£160.00</span><span style="font-variant-numeric:tabular-nums;color:#56646F">£280.00</span><span style="color:#56646F">41 · avg 1.6h</span>
+              <span style="color:#1C7A43;font-weight:800;font-size:13px">Save</span>
+            </div>
+            <div style="display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 1.2fr .7fr;padding:13px 18px;border-bottom:1px solid #EEF1F4;font-size:14px;align-items:center">
+              <span style="font-weight:700">No hot water — diagnose &amp; fix</span><span style="font-variant-numeric:tabular-nums">£183.33</span><span style="font-weight:700;font-variant-numeric:tabular-nums">£220.00</span><span style="font-variant-numeric:tabular-nums;color:#56646F">£385.00</span><span style="color:#56646F">28 · avg 2.1h</span><span style="color:#0F4C81;font-weight:700;font-size:13px">Edit</span>
+            </div>
+            <div style="display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 1.2fr .7fr;padding:13px 18px;border-bottom:1px solid #EEF1F4;font-size:14px;align-items:center">
+              <span style="font-weight:700">Replace isolator valve</span><span style="font-variant-numeric:tabular-nums">£50.00</span><span style="font-weight:700;font-variant-numeric:tabular-nums">£60.00</span><span style="font-variant-numeric:tabular-nums;color:#56646F">£105.00</span><span style="color:#56646F">19 · avg 0.8h</span><span style="color:#0F4C81;font-weight:700;font-size:13px">Edit</span>
+            </div>
+            <div style="display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 1.2fr .7fr;padding:13px 18px;font-size:14px;align-items:center">
+              <span style="font-weight:700">Toilet not flushing / running</span><span style="font-variant-numeric:tabular-nums">£125.00</span><span style="font-weight:700;font-variant-numeric:tabular-nums">£150.00</span><span style="font-variant-numeric:tabular-nums;color:#56646F">£262.50</span><span style="color:#56646F">33 · avg 1.1h</span><span style="color:#0F4C81;font-weight:700;font-size:13px">Edit</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;background:#FCF2DE;border-radius:12px;padding:12px 16px;max-width:720px">
+            <span style="width:16px;height:16px;flex:none;margin-top:2px;display:inline-block;background:#7A5600;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/triangle-alert.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/triangle-alert.svg) center/contain no-repeat"></span>
+            <span style="font-size:13px;color:#7A5600;font-weight:600;line-height:1.5">Price changes apply to new requests only — jobs already priced keep the price the landlord approved.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ A4 Technician registry ============ -->
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:13px;font-weight:700;color:#17222E"><span style="font-family:ui-monospace,monospace;background:#17222E;color:#FFFFFF;border-radius:5px;padding:2px 7px;font-size:11px;margin-right:8px">A4</span>Technician registry — certification enforcement</div>
+    <div style="width:1360px;background:#F4F6F8;border:1px solid #D8DEE4;border-radius:14px;overflow:hidden;box-shadow:0 24px 48px rgba(23,34,46,.12)" data-screen-label="Technician registry">
+      <div style="background:#FFFFFF;border-bottom:1px solid #E2E7EC;display:flex;align-items:center;gap:8px;padding:10px 16px">
+        <span style="width:11px;height:11px;border-radius:50%;background:#E2E7EC"></span><span style="width:11px;height:11px;border-radius:50%;background:#E2E7EC"></span><span style="width:11px;height:11px;border-radius:50%;background:#E2E7EC"></span>
+        <span style="margin-left:14px;background:#F1F4F6;border-radius:8px;padding:5px 14px;font-size:12px;color:#56646F;font-family:ui-monospace,monospace">ops.propcare.uk/technicians</span>
+      </div>
+      <div style="display:flex;min-height:620px">
+        <div style="width:216px;background:#0F2C4A;color:#FFFFFF;display:flex;flex-direction:column;padding:20px 14px;gap:4px;flex:none">
+          <div style="font-size:18px;font-weight:800;letter-spacing:-0.02em;padding:0 10px 18px">PropCare <span style="font-weight:400;opacity:.7">Ops</span></div>
+          <div style="border-radius:9px;padding:10px 12px;font-size:14px;font-weight:600;opacity:.75">Dispatch</div>
+          <div style="border-radius:9px;padding:10px 12px;font-size:14px;font-weight:600;opacity:.75">Variations</div>
+          <div style="border-radius:9px;padding:10px 12px;font-size:14px;font-weight:600;opacity:.75">Rate card</div>
+          <div style="background:rgba(255,255,255,.14);border-radius:9px;padding:10px 12px;font-size:14px;font-weight:700">Technicians</div>
+        </div>
+        <div style="flex:1;padding:24px 28px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><h2 style="margin:0;font-size:22px;font-weight:800;letter-spacing:-0.01em">Technicians — 12 active</h2><div style="font-size:13px;color:#56646F;margin-top:2px">Expired documents automatically block assignment for the affected trade.</div></div>
+            <div style="background:#0F4C81;color:#FFFFFF;font-size:13.5px;font-weight:700;min-height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 20px">＋ Invite technician</div>
+          </div>
+          <div style="background:#FBEBEA;border:1px solid #ECC9C7;border-radius:12px;padding:12px 16px;display:flex;gap:10px;align-items:flex-start;max-width:820px">
+            <span style="width:17px;height:17px;flex:none;margin-top:1px;display:inline-block;background:#B3261E;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/shield-alert.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/shield-alert.svg) center/contain no-repeat"></span>
+            <span style="font-size:13.5px;color:#B3261E;font-weight:700;line-height:1.5">1 technician blocked: Ravi M.'s NAPIT registration expired 30/06/2026. He can't receive electrical jobs until a valid certificate is uploaded and verified.</span>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E2E7EC;border-radius:12px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:1.8fr 1.2fr 1.6fr 1.4fr 1.2fr 1fr;padding:12px 18px;background:#F8FAFB;border-bottom:1px solid #E2E7EC;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#8A96A1">
+              <span>Technician</span><span>Trade</span><span>Certification</span><span>Insurance expiry</span><span>On-call</span><span>Status</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1.8fr 1.2fr 1.6fr 1.4fr 1.2fr 1fr;padding:13px 18px;border-bottom:1px solid #EEF1F4;font-size:14px;align-items:center">
+              <span style="display:flex;align-items:center;gap:10px"><span style="width:32px;height:32px;border-radius:50%;background:repeating-linear-gradient(45deg,#E3E8EC,#E3E8EC 5px,#F1F4F6 5px,#F1F4F6 10px)"></span><span style="font-weight:700">Sam Okafor</span></span>
+              <span style="color:#56646F">Plumbing</span>
+              <span style="color:#56646F">WRAS · Gas Safe</span>
+              <span style="font-variant-numeric:tabular-nums;color:#56646F">03/03/2027</span>
+              <span><span style="background:#E6F4EB;color:#1C7A43;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px">Opted in</span></span>
+              <span><span style="background:#E6F4EB;color:#1C7A43;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px">Active</span></span>
+            </div>
+            <div style="display:grid;grid-template-columns:1.8fr 1.2fr 1.6fr 1.4fr 1.2fr 1fr;padding:13px 18px;border-bottom:1px solid #EEF1F4;font-size:14px;align-items:center">
+              <span style="display:flex;align-items:center;gap:10px"><span style="width:32px;height:32px;border-radius:50%;background:repeating-linear-gradient(45deg,#E3E8EC,#E3E8EC 5px,#F1F4F6 5px,#F1F4F6 10px)"></span><span style="font-weight:700">Lena Kowalska</span></span>
+              <span style="color:#56646F">Electrical</span>
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:15px;height:15px;display:inline-block;background:#1C7A43;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/shield-check.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/shield-check.svg) center/contain no-repeat"></span><span style="font-weight:700">NICEIC #E4471</span></span>
+              <span style="font-variant-numeric:tabular-nums;color:#56646F">18/11/2026</span>
+              <span><span style="background:#EEF1F4;color:#4A5560;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px">Opted out</span></span>
+              <span><span style="background:#E6F4EB;color:#1C7A43;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px">Active</span></span>
+            </div>
+            <div style="display:grid;grid-template-columns:1.8fr 1.2fr 1.6fr 1.4fr 1.2fr 1fr;padding:13px 18px;border-bottom:1px solid #EEF1F4;font-size:14px;align-items:center">
+              <span style="display:flex;align-items:center;gap:10px"><span style="width:32px;height:32px;border-radius:50%;background:repeating-linear-gradient(45deg,#E3E8EC,#E3E8EC 5px,#F1F4F6 5px,#F1F4F6 10px)"></span><span style="font-weight:700">Dev Patel</span></span>
+              <span style="color:#56646F">Plumbing</span>
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:15px;height:15px;display:inline-block;background:#B98200;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/shield-alert.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/shield-alert.svg) center/contain no-repeat"></span><span style="color:#7A5600;font-weight:700">Gas Safe — 55 days</span></span>
+              <span style="font-variant-numeric:tabular-nums;color:#7A5600;font-weight:700">28/08/2026</span>
+              <span><span style="background:#E6F4EB;color:#1C7A43;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px">Opted in</span></span>
+              <span><span style="background:#FCF2DE;color:#7A5600;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px">Renew soon</span></span>
+            </div>
+            <div style="display:grid;grid-template-columns:1.8fr 1.2fr 1.6fr 1.4fr 1.2fr 1fr;padding:13px 18px;font-size:14px;align-items:center;background:#FDF6F6">
+              <span style="display:flex;align-items:center;gap:10px"><span style="width:32px;height:32px;border-radius:50%;background:repeating-linear-gradient(45deg,#EBDDDC,#EBDDDC 5px,#F6EEEE 5px,#F6EEEE 10px)"></span><span style="font-weight:700">Ravi Mehta</span></span>
+              <span style="color:#56646F">Electrical</span>
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:15px;height:15px;display:inline-block;background:#B3261E;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/shield-x.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/shield-x.svg) center/contain no-repeat"></span><span style="color:#B3261E;font-weight:800">NAPIT — expired</span></span>
+              <span style="font-variant-numeric:tabular-nums;color:#B3261E;font-weight:700">30/06/2026</span>
+              <span><span style="background:#EEF1F4;color:#A9B3BC;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px">Suspended</span></span>
+              <span><span style="display:inline-flex;align-items:center;gap:5px;background:#FBEBEA;color:#B3261E;font-size:11.5px;font-weight:800;padding:3px 10px;border-radius:999px"><span style="width:11px;height:11px;display:inline-block;background:#B3261E;-webkit-mask:url(https://unpkg.com/lucide-static@0.462.0/icons/lock.svg) center/contain no-repeat;mask:url(https://unpkg.com/lucide-static@0.462.0/icons/lock.svg) center/contain no-repeat"></span>Blocked</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</x-dc>
+</body>
+</html>
