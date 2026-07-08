@@ -1,6 +1,6 @@
-import { router, Stack } from 'expo-router';
+import { router, Stack, useFocusEffect } from 'expo-router';
 import { Home } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { PrimaryButton } from '@/components/primary-button';
@@ -14,11 +14,35 @@ import { useDraft } from '@/lib/new-request-draft';
 export default function PickProperty() {
   const { colors: c } = usePalette();
   const draft = useDraft();
-  const [properties, setProperties] = useState<Property[] | null>(null);
-
+  const draftRef = useRef(draft);
   useEffect(() => {
-    listProperties().then(setProperties).catch(() => setProperties([]));
-  }, []);
+    draftRef.current = draft;
+  }, [draft]);
+  const [properties, setProperties] = useState<Property[] | null>(null);
+  const knownCount = useRef<number | null>(null);
+
+  // Reload every time this step regains focus (e.g. after adding a property),
+  // and auto-select a freshly added property when nothing is chosen yet.
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      listProperties()
+        .then((list) => {
+          if (!active) return;
+          setProperties(list);
+          if (knownCount.current !== null && list.length > knownCount.current && !draftRef.current.property) {
+            draftRef.current.update({ property: list[list.length - 1] });
+          }
+          knownCount.current = list.length;
+        })
+        .catch(() => {
+          if (active) setProperties([]);
+        });
+      return () => {
+        active = false;
+      };
+    }, []),
+  );
 
   return (
     <>
