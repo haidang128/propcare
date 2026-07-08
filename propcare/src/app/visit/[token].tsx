@@ -33,16 +33,15 @@ function slotLabel(s: { start: string; end: string }): { day: string; time: stri
 export default function TenantVisit() {
   const { colors: c, status } = usePalette();
   const { token } = useLocalSearchParams<{ token: string }>();
-  const [info, setInfo] = useState<SlotInfo | null | 'error' | 'expired'>(null);
+  const [info, setInfo] = useState<SlotInfo | null | 'error' | 'expired'>(
+    TENANT_ACCESS_ENDPOINT ? null : 'error',
+  );
   const [selected, setSelected] = useState(0);
   const [confirming, setConfirming] = useState(false);
   const [confirmed, setConfirmed] = useState<{ start: string; end: string } | null>(null);
 
   useEffect(() => {
-    if (!TENANT_ACCESS_ENDPOINT) {
-      setInfo('error');
-      return;
-    }
+    if (!TENANT_ACCESS_ENDPOINT) return;
     fetch(`${TENANT_ACCESS_ENDPOINT}?token=${token}`)
       .then(async (r) => {
         if (r.status === 410) return setInfo('expired');

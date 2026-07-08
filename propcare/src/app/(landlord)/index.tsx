@@ -5,7 +5,7 @@ import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native'
 
 import { PriceDisplay } from '@/components/price-display';
 import { StatusChip } from '@/components/status-chip';
-import { Radius, TouchTarget } from '@/constants/theme';
+import { Radius } from '@/constants/theme';
 import { useJobsRealtime } from '@/hooks/use-jobs-realtime';
 import { usePalette } from '@/hooks/use-palette';
 import { listActiveJobs, listProperties, type Job, type Property } from '@/lib/data';

@@ -11,10 +11,8 @@ import { Radius } from '@/constants/theme';
 import { usePalette } from '@/hooks/use-palette';
 import {
   decideVariation,
-  getJob,
   getJobPhotoUrls,
   getPendingVariationForJob,
-  type Job,
   type Variation,
 } from '@/lib/data';
 import { formatGBP } from '@/lib/job-status';
@@ -27,13 +25,11 @@ import { formatGBP } from '@/lib/job-status';
 export default function VariationApproval() {
   const { colors: c, status } = usePalette();
   const { jobId } = useLocalSearchParams<{ jobId: string }>();
-  const [job, setJob] = useState<Job | null>(null);
   const [variation, setVariation] = useState<Variation | null | undefined>(undefined);
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    getJob(jobId).then(setJob);
     getPendingVariationForJob(jobId).then(setVariation);
     getJobPhotoUrls(jobId, 'variation').then(setPhotoUrls);
   }, [jobId]);

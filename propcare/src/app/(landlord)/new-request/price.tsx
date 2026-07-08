@@ -45,7 +45,7 @@ export default function PriceApproval() {
   const draft = useDraft();
   const jobType = draft.jobType!;
   const price = jobPrice(jobType, draft.urgency);
-  const slots = useMemo(upcomingSlots, []);
+  const slots = useMemo(() => upcomingSlots(), []);
   const [slotIndex, setSlotIndex] = useState(0);
   const [booking, setBooking] = useState(false);
 
