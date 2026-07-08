@@ -53,15 +53,15 @@ export default function LandlordHome() {
       contentContainerStyle={{ padding: 20, gap: 16 }}>
       <Link href="/(landlord)/new-request" asChild>
         <Pressable
-          style={({ pressed }) => ({
-            backgroundColor: pressed ? c.primaryPressed : c.primary,
+          style={{
+            backgroundColor: c.primary,
             minHeight: 54,
             borderRadius: 14,
             borderCurve: 'continuous',
             alignItems: 'center',
             justifyContent: 'center',
             boxShadow: '0 8px 24px rgba(15,76,129,0.25)',
-          })}>
+          }}>
           <Text style={{ color: c.onPrimary, fontSize: 16, fontWeight: '700' }}>
             ＋ New request
           </Text>

@@ -1,10 +1,15 @@
 import { Stack } from 'expo-router/stack';
 import React from 'react';
 
+import { HeaderSignOut } from '@/components/header-sign-out';
+
 export default function LandlordLayout() {
   return (
     <Stack>
-      <Stack.Screen name="index" options={{ title: 'PropCare', headerLargeTitle: true }} />
+      <Stack.Screen
+        name="index"
+        options={{ title: 'PropCare', headerLargeTitle: true, headerRight: () => <HeaderSignOut /> }}
+      />
       <Stack.Screen name="add-property" options={{ title: 'Add a property' }} />
       {/* the wizard renders its own stack + headers */}
       <Stack.Screen name="new-request" options={{ headerShown: false }} />
