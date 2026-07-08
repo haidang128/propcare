@@ -1,9 +1,14 @@
+import { Redirect } from 'expo-router';
 import { Stack } from 'expo-router/stack';
 import React from 'react';
 
 import { HeaderSignOut } from '@/components/header-sign-out';
+import { useAuth } from '@/lib/auth';
 
 export default function LandlordLayout() {
+  const { role, loading } = useAuth();
+  if (loading) return null;
+  if (!role) return <Redirect href="/sign-in" />;
   return (
     <Stack>
       <Stack.Screen

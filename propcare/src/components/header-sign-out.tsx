@@ -15,7 +15,7 @@ export function HeaderSignOut() {
       hitSlop={10}
       onPress={() => {
         signOut();
-        router.replace('/'); // role is now null → root redirects to /sign-in
+        router.replace('/sign-in');
       }}
       style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 4 }}>
       <LogOut size={17} color={c.primary} />
