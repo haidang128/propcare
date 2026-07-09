@@ -9,6 +9,7 @@ import { showDialog } from '@/components/dialog';
 import { Radius } from '@/constants/theme';
 import { usePalette } from '@/hooks/use-palette';
 import { getProperty, listPropertyHistory, type Category, type HistoryEntry, type Property } from '@/lib/data';
+import { downloadTextFile } from '@/lib/share';
 import { formatGBP, statusLabel } from '@/lib/job-status';
 
 const fmtDate = (iso: string) => new Date(iso).toLocaleDateString('en-GB');
@@ -89,9 +90,15 @@ export default function PropertyHistory() {
         text: 'PDF',
         onPress: async () => {
           try {
-            const { uri } = await Print.printToFileAsync({ html: pdfHtmlFor(property, filtered) });
-            if (Platform.OS !== 'web' && (await Sharing.isAvailableAsync())) {
-              await Sharing.shareAsync(uri, { mimeType: 'application/pdf' });
+            const html = pdfHtmlFor(property, filtered);
+            if (Platform.OS === 'web') {
+              // web has no file system — open the print dialog (save-as-PDF)
+              await Print.printAsync({ html });
+            } else {
+              const { uri } = await Print.printToFileAsync({ html });
+              if (await Sharing.isAvailableAsync()) {
+                await Sharing.shareAsync(uri, { mimeType: 'application/pdf' });
+              }
             }
           } catch (e) {
             showDialog('Export failed', e instanceof Error ? e.message : 'Try again.');
@@ -100,7 +107,14 @@ export default function PropertyHistory() {
       },
       {
         text: 'CSV',
-        onPress: () => Share.share({ message: csvFor(property, filtered) }),
+        onPress: () => {
+          const csv = csvFor(property, filtered);
+          if (Platform.OS === 'web') {
+            downloadTextFile(`${property.address_line1}-maintenance.csv`, csv, 'text/csv;charset=utf-8');
+          } else {
+            Share.share({ message: csv });
+          }
+        },
       },
       { text: 'Cancel', style: 'cancel' },
     ]);

@@ -1,10 +1,11 @@
 import { useLocalSearchParams } from 'expo-router';
 import { Droplets, Phone } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { Linking, Pressable, ScrollView, Share, Text, View } from 'react-native';
+import { Linking, Pressable, ScrollView, Text, View } from 'react-native';
 
 import { usePalette } from '@/hooks/use-palette';
 import { getJob, type Job } from '@/lib/data';
+import { shareText } from '@/lib/share';
 
 const STEPS = [
   'Find the stopcock — usually under the kitchen sink or by the front door.',
@@ -74,7 +75,7 @@ export default function EmergencyFallback() {
         ))}
         {tenantFirst ? (
           <Pressable
-            onPress={() => Share.share({ message: `Urgent — until the engineer arrives:\n${STEPS.map((s, i) => `${i + 1}. ${s}`).join('\n')}` })}
+            onPress={() => shareText(`Urgent — until the engineer arrives:\n${STEPS.map((s, i) => `${i + 1}. ${s}`).join('\n')}`)}
             style={{
               borderWidth: 1.5,
               borderColor: c.primary,

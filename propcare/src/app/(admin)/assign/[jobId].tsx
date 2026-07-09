@@ -1,12 +1,13 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { LockKeyhole, ShieldCheck } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { Pressable, ScrollView, Share, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { showDialog } from '@/components/dialog';
 import { PrimaryButton } from '@/components/primary-button';
 import { Radius } from '@/constants/theme';
 import { usePalette } from '@/hooks/use-palette';
+import { shareText } from '@/lib/share';
 import {
   assignJob,
   getJob,
@@ -44,7 +45,10 @@ export default function AssignSheet() {
           'Assigned — send the access link',
           `Text ${job.property.tenant_name} this link so they can pick a time:\n\n${tenantLink}`,
           [
-            { text: 'Share…', onPress: () => Share.share({ message: tenantLink }) },
+            {
+              text: 'Share…',
+              onPress: () => shareText(tenantLink, { title: 'Access link', copiedTitle: 'Link copied' }),
+            },
             { text: 'Done', onPress: () => router.back() },
           ],
         );
