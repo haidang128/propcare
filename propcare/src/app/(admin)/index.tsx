@@ -163,14 +163,14 @@ export default function AdminDispatch() {
 
             <Link href={{ pathname: '/(admin)/assign/[jobId]', params: { jobId: job.id } }} asChild>
               <Pressable
-                style={({ pressed }) => ({
-                  backgroundColor: pressed ? c.primaryPressed : c.primary,
+                style={{
+                  backgroundColor: c.primary,
                   minHeight: 40,
                   borderRadius: Radius.button,
                   borderCurve: 'continuous',
                   alignItems: 'center',
                   justifyContent: 'center',
-                })}>
+                }}>
                 <Text style={{ color: c.onPrimary, fontSize: 13.5, fontWeight: '700' }}>Assign</Text>
               </Pressable>
             </Link>
