@@ -3,8 +3,9 @@ import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import { Camera } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 
+import { showDialog } from '@/components/dialog';
 import { PrimaryButton } from '@/components/primary-button';
 import { Radius } from '@/constants/theme';
 import { usePalette } from '@/hooks/use-palette';
@@ -56,7 +57,7 @@ export default function FlagVariation() {
       await flagVariation(job, { note: fullNote || 'Extra work found', photoUris, suggestedPrice: suggested });
       router.back();
     } catch (e) {
-      Alert.alert('Could not send', e instanceof Error ? e.message : 'Try again.');
+      showDialog('Could not send', e instanceof Error ? e.message : 'Try again.');
     } finally {
       setSending(false);
     }

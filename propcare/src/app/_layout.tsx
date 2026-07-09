@@ -11,6 +11,7 @@ import { Stack } from 'expo-router/stack';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 
+import { DialogHost } from '@/components/dialog';
 import { usePalette } from '@/hooks/use-palette';
 import { usePushRegistration } from '@/hooks/use-push-registration';
 import { AuthProvider } from '@/lib/auth';
@@ -64,6 +65,7 @@ export default function RootLayout() {
           {/* public tenant page — token in the URL is the credential */}
           <Stack.Screen name="visit/[token]" />
         </Stack>
+        <DialogHost />
       </AuthProvider>
     </ThemeProvider>
   );

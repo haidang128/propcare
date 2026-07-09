@@ -2,8 +2,9 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
 import { LockKeyhole } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 
+import { showDialog } from '@/components/dialog';
 import { PriceDisplay } from '@/components/price-display';
 import { PrimaryButton } from '@/components/primary-button';
 import { StatusChip } from '@/components/status-chip';
@@ -62,7 +63,7 @@ export default function VariationApproval() {
       await decideVariation(variation!, approve);
       router.back();
     } catch (e) {
-      Alert.alert('Something went wrong', e instanceof Error ? e.message : 'Try again.');
+      showDialog('Something went wrong', e instanceof Error ? e.message : 'Try again.');
     } finally {
       setBusy(false);
     }
@@ -146,7 +147,7 @@ export default function VariationApproval() {
         <PrimaryButton label={`Approve new price — ${formatGBP(newTotal)}`} loading={busy} onPress={() => decide(true)} />
         <Pressable
           onPress={() =>
-            Alert.alert(
+            showDialog(
               'Decline the extra work?',
               "The job pauses and you won't be charged — we'll call you to rearrange or cancel.",
               [

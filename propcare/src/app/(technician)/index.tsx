@@ -1,8 +1,9 @@
 import { Link, Stack, useFocusEffect } from 'expo-router';
 import { CalendarDays, Check, KeyRound } from 'lucide-react-native';
 import React, { useCallback, useState } from 'react';
-import { Alert, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 
+import { showDialog } from '@/components/dialog';
 import { StatusChip } from '@/components/status-chip';
 import { useJobsRealtime } from '@/hooks/use-jobs-realtime';
 import { usePalette } from '@/hooks/use-palette';
@@ -42,7 +43,7 @@ export default function TechnicianToday() {
       await respondToAssignment(job.id, accept);
       await load();
     } catch (e) {
-      Alert.alert('Could not respond', e instanceof Error ? e.message : 'Try again.');
+      showDialog('Could not respond', e instanceof Error ? e.message : 'Try again.');
     }
   }
 
@@ -172,7 +173,7 @@ export default function TechnicianToday() {
                   </Pressable>
                   <Pressable
                     onPress={() =>
-                      Alert.alert('Decline this job?', 'It goes back to the office for reassignment.', [
+                      showDialog('Decline this job?', 'It goes back to the office for reassignment.', [
                         { text: 'Keep it', style: 'cancel' },
                         { text: 'Decline', style: 'destructive', onPress: () => respond(job, false) },
                       ])

@@ -3,8 +3,9 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { Download } from 'lucide-react-native';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Alert, Platform, Pressable, ScrollView, Share, Text, View } from 'react-native';
+import { Platform, Pressable, ScrollView, Share, Text, View } from 'react-native';
 
+import { showDialog } from '@/components/dialog';
 import { Radius } from '@/constants/theme';
 import { usePalette } from '@/hooks/use-palette';
 import { getProperty, listPropertyHistory, type Category, type HistoryEntry, type Property } from '@/lib/data';
@@ -83,7 +84,7 @@ export default function PropertyHistory() {
 
   async function exportRecord() {
     if (!property) return;
-    Alert.alert('Export maintenance record', 'Pick a format', [
+    showDialog('Export maintenance record', 'Pick a format', [
       {
         text: 'PDF',
         onPress: async () => {
@@ -93,7 +94,7 @@ export default function PropertyHistory() {
               await Sharing.shareAsync(uri, { mimeType: 'application/pdf' });
             }
           } catch (e) {
-            Alert.alert('Export failed', e instanceof Error ? e.message : 'Try again.');
+            showDialog('Export failed', e instanceof Error ? e.message : 'Try again.');
           }
         },
       },

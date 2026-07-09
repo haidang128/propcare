@@ -4,7 +4,6 @@ import { CreditCard } from 'lucide-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Linking,
   Pressable,
   ScrollView,
@@ -13,6 +12,7 @@ import {
   View,
 } from 'react-native';
 
+import { showDialog } from '@/components/dialog';
 import { PrimaryButton } from '@/components/primary-button';
 import { StarRating } from '@/components/star-rating';
 import { StatusChip } from '@/components/status-chip';
@@ -82,17 +82,17 @@ export default function CompletionAndPayment() {
       if (url) {
         await Linking.openURL(url);
       } else if (error) {
-        Alert.alert('Payment', error);
+        showDialog('Payment', error);
       }
     } catch (e) {
-      Alert.alert('Something went wrong', e instanceof Error ? e.message : 'Try again.');
+      showDialog('Something went wrong', e instanceof Error ? e.message : 'Try again.');
     } finally {
       setPaying(false);
     }
   }
 
   function dispute() {
-    Alert.alert(
+    showDialog(
       'Something not right?',
       'Raising a dispute pauses payment until we resolve it with you — nothing is charged in the meantime.',
       [
@@ -105,7 +105,7 @@ export default function CompletionAndPayment() {
               await raiseDispute(job!.id, 'Landlord raised a dispute from the completion screen');
               load();
             } catch (e) {
-              Alert.alert('Could not raise dispute', e instanceof Error ? e.message : 'Try again.');
+              showDialog('Could not raise dispute', e instanceof Error ? e.message : 'Try again.');
             }
           },
         },

@@ -1,8 +1,9 @@
 import { router, Stack } from 'expo-router';
 import { Check } from 'lucide-react-native';
 import React, { useMemo, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 
+import { showDialog } from '@/components/dialog';
 import { PriceDisplay } from '@/components/price-display';
 import { PrimaryButton } from '@/components/primary-button';
 import { StepBadge } from '@/components/step-badge';
@@ -64,7 +65,7 @@ export default function PriceApproval() {
       draft.update({ bookedJob: job, slot });
       router.replace('/(landlord)/new-request/booked');
     } catch (e) {
-      Alert.alert('Booking failed', e instanceof Error ? e.message : 'Please try again.');
+      showDialog('Booking failed', e instanceof Error ? e.message : 'Please try again.');
     } finally {
       setBooking(false);
     }

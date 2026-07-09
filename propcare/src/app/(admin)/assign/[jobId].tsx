@@ -1,8 +1,9 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { LockKeyhole, ShieldCheck } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { Alert, Pressable, ScrollView, Share, Text, View } from 'react-native';
+import { Pressable, ScrollView, Share, Text, View } from 'react-native';
 
+import { showDialog } from '@/components/dialog';
 import { PrimaryButton } from '@/components/primary-button';
 import { Radius } from '@/constants/theme';
 import { usePalette } from '@/hooks/use-palette';
@@ -39,7 +40,7 @@ export default function AssignSheet() {
       const tenantLink = await assignJob(job, selected);
       if (tenantLink && job.property?.tenant_name) {
         // SMS automation lands with Twilio; until then the dispatcher sends it
-        Alert.alert(
+        showDialog(
           'Assigned — send the access link',
           `Text ${job.property.tenant_name} this link so they can pick a time:\n\n${tenantLink}`,
           [
@@ -51,7 +52,7 @@ export default function AssignSheet() {
         router.back();
       }
     } catch (e) {
-      Alert.alert('Assignment failed', e instanceof Error ? e.message : 'Please try again.');
+      showDialog('Assignment failed', e instanceof Error ? e.message : 'Please try again.');
     } finally {
       setSaving(false);
     }

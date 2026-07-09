@@ -3,8 +3,9 @@ import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import { BadgePlus, Camera, CheckCheck, Pause, Play } from 'lucide-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 
+import { showDialog } from '@/components/dialog';
 import { PrimaryButton } from '@/components/primary-button';
 import { StatusChip } from '@/components/status-chip';
 import { usePalette } from '@/hooks/use-palette';
@@ -46,7 +47,7 @@ export default function TechnicianJob() {
       await transitionJobStatus(job.id, to);
       load();
     } catch (e) {
-      Alert.alert('Could not update status', e instanceof Error ? e.message : 'Try again.');
+      showDialog('Could not update status', e instanceof Error ? e.message : 'Try again.');
     } finally {
       setBusy(false);
     }
@@ -180,7 +181,7 @@ export default function TechnicianJob() {
             disabled={!started || !photos.after}
             loading={busy}
             onPress={() =>
-              Alert.alert('Finish this job?', 'The landlord will be asked to confirm and pay.', [
+              showDialog('Finish this job?', 'The landlord will be asked to confirm and pay.', [
                 { text: 'Not yet', style: 'cancel' },
                 { text: 'Mark done', onPress: () => move('completed') },
               ])
@@ -221,7 +222,7 @@ function MaterialsLog({
       setDescription('');
       setCost('');
     } catch (e) {
-      Alert.alert('Could not add material', e instanceof Error ? e.message : 'Try again.');
+      showDialog('Could not add material', e instanceof Error ? e.message : 'Try again.');
     } finally {
       setSaving(false);
     }

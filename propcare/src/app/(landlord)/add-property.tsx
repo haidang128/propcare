@@ -1,8 +1,9 @@
 import { router } from 'expo-router';
 import { Info } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Alert, ScrollView, Text, TextInput, View } from 'react-native';
+import { ScrollView, Text, TextInput, View } from 'react-native';
 
+import { showDialog } from '@/components/dialog';
 import { PrimaryButton } from '@/components/primary-button';
 import { Radius } from '@/constants/theme';
 import { usePalette } from '@/hooks/use-palette';
@@ -33,7 +34,7 @@ export default function AddProperty() {
       });
       router.back();
     } catch (e) {
-      Alert.alert('Could not save property', e instanceof Error ? e.message : 'Please try again.');
+      showDialog('Could not save property', e instanceof Error ? e.message : 'Please try again.');
     } finally {
       setSaving(false);
     }

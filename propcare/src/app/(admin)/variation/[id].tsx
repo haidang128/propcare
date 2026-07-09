@@ -2,8 +2,9 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Image } from 'expo-image';
 import { LockKeyhole } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 
+import { showDialog } from '@/components/dialog';
 import { PriceDisplay } from '@/components/price-display';
 import { PrimaryButton } from '@/components/primary-button';
 import { StatusChip } from '@/components/status-chip';
@@ -57,14 +58,14 @@ export default function VariationReview() {
       await sendVariationToLandlord(variation.id, Math.round(parsedPrice * 100) / 100);
       router.back();
     } catch (e) {
-      Alert.alert('Could not send', e instanceof Error ? e.message : 'Try again.');
+      showDialog('Could not send', e instanceof Error ? e.message : 'Try again.');
     } finally {
       setBusy(false);
     }
   }
 
   function reject() {
-    Alert.alert(
+    showDialog(
       'Reject this variation?',
       'The job resumes at the original price and the technician is expected to complete the original scope.',
       [
@@ -78,7 +79,7 @@ export default function VariationReview() {
               await rejectVariation(variation!);
               router.back();
             } catch (e) {
-              Alert.alert('Could not reject', e instanceof Error ? e.message : 'Try again.');
+              showDialog('Could not reject', e instanceof Error ? e.message : 'Try again.');
             } finally {
               setBusy(false);
             }
