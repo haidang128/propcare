@@ -1,13 +1,13 @@
 import { router, Stack } from 'expo-router';
 import { TriangleAlert } from 'lucide-react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { PrimaryButton } from '@/components/primary-button';
 import { StepBadge } from '@/components/step-badge';
 import { Radius } from '@/constants/theme';
 import { usePalette } from '@/hooks/use-palette';
-import { jobPrice } from '@/lib/data';
+import { canBookOutOfHours, jobPrice } from '@/lib/data';
 import { incVatSuffix, pricing } from '@/lib/pricing';
 import { formatGBP } from '@/lib/job-status';
 import { useDraft } from '@/lib/new-request-draft';
@@ -17,6 +17,15 @@ export default function PickUrgency() {
   const { colors: c, status } = usePalette();
   const draft = useDraft();
   const jobType = draft.jobType!;
+  const offerOutOfHours = canBookOutOfHours(jobType);
+
+  // A draft can carry an out-of-hours choice from a previous, eligible job type.
+  // The database would reject the insert; reset it here so the price is honest.
+  useEffect(() => {
+    if (!offerOutOfHours && draft.urgency === 'out_of_hours') {
+      draft.update({ urgency: 'standard' });
+    }
+  }, [offerOutOfHours, draft]);
 
   return (
     <>
@@ -54,6 +63,13 @@ export default function PickUrgency() {
           </Text>
         </Pressable>
 
+        {!offerOutOfHours ? (
+          <Text style={{ fontSize: 13, color: c.textTertiary, lineHeight: 19 }}>
+            Out-of-hours call-out isn&apos;t available for this job. For an emergency — a burst pipe
+            or a leak you can&apos;t stop — start a new request and choose{' '}
+            <Text style={{ fontWeight: '700' }}>Isolate + make safe</Text>.
+          </Text>
+        ) : (
         <Pressable
           onPress={() => draft.update({ urgency: 'out_of_hours' })}
           style={{
@@ -108,6 +124,7 @@ export default function PickUrgency() {
             </Text>
           </View>
         </Pressable>
+        )}
 
         <View style={{ marginTop: 'auto' }}>
           <PrimaryButton

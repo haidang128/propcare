@@ -27,6 +27,8 @@ export type JobType = {
   name: string;
   price_ex_vat: number;
   price_inc_vat: number;
+  /** Emergency lines only — enforced by the jobs_ooh_eligibility trigger too. */
+  out_of_hours_eligible: boolean;
 };
 
 export type Job = {
@@ -81,10 +83,15 @@ export type NewJobDraft = {
   slot: { start: string; end: string } | null;
 };
 
+/** True when the surcharge tier is offered at all for this job type. */
+export function canBookOutOfHours(jobType: JobType): boolean {
+  return jobType.out_of_hours_eligible && pricing().out_of_hours_multiplier > 1;
+}
+
 export function jobPrice(jobType: JobType, urgency: Urgency): number {
   const { out_of_hours_multiplier, minimum_job_inc_vat } = pricing();
   const base = Math.max(jobType.price_inc_vat, minimum_job_inc_vat);
-  return urgency === 'out_of_hours'
+  return urgency === 'out_of_hours' && canBookOutOfHours(jobType)
     ? Math.round(base * out_of_hours_multiplier * 100) / 100
     : base;
 }
@@ -113,13 +120,15 @@ const demo = {
     },
   ] as Property[],
   jobTypes: [
-    { id: 'jt1', category: 'plumbing', name: 'Leaking / dripping tap', price_ex_vat: 150, price_inc_vat: 180 },
-    { id: 'jt2', category: 'plumbing', name: 'Blocked drain / waste', price_ex_vat: 133.33, price_inc_vat: 160 },
+    { id: 'jt1', category: 'plumbing', name: 'Dripping / leaking tap repair', price_ex_vat: 95, price_inc_vat: 95, out_of_hours_eligible: false },
+    { id: 'jt2', category: 'plumbing', name: 'Sink / bath / shower unblock', price_ex_vat: 105, price_inc_vat: 105, out_of_hours_eligible: false },
+    // The one emergency line — the only job bookable out of hours.
+    { id: 'jt3', category: 'plumbing', name: 'Isolate + make safe (leak emergency)', price_ex_vat: 110, price_inc_vat: 110, out_of_hours_eligible: true },
     // No boiler/hot-water line: gas is deferred until Gas Safe vetting (PRD decision #6).
-    { id: 'jt4', category: 'electrical', name: 'Socket not working', price_ex_vat: 116.67, price_inc_vat: 140 },
-    { id: 'jt5', category: 'electrical', name: 'Light fitting replacement', price_ex_vat: 108.33, price_inc_vat: 130 },
-    { id: 'jt6', category: 'handyman', name: 'Sticking / misaligned door', price_ex_vat: 79.17, price_inc_vat: 95 },
-    { id: 'jt7', category: 'handyman', name: 'Lock change', price_ex_vat: 87.5, price_inc_vat: 105 },
+    { id: 'jt4', category: 'electrical', name: 'Socket replacement', price_ex_vat: 85, price_inc_vat: 85, out_of_hours_eligible: false },
+    { id: 'jt5', category: 'electrical', name: 'Light fitting replacement', price_ex_vat: 95, price_inc_vat: 95, out_of_hours_eligible: false },
+    { id: 'jt6', category: 'handyman', name: 'Internal door adjustment', price_ex_vat: 85, price_inc_vat: 85, out_of_hours_eligible: false },
+    { id: 'jt7', category: 'handyman', name: 'Lock replacement', price_ex_vat: 95, price_inc_vat: 95, out_of_hours_eligible: false },
   ] as JobType[],
   jobs: [] as Job[],
   counter: 2041,
@@ -180,7 +189,7 @@ export async function listJobTypes(): Promise<JobType[]> {
   if (!isSupabaseConfigured) return [...demo.jobTypes];
   const { data, error } = await supabase!
     .from('job_types')
-    .select('id, category, name, price_ex_vat, price_inc_vat')
+    .select('id, category, name, price_ex_vat, price_inc_vat, out_of_hours_eligible')
     .eq('active', true)
     .order('price_inc_vat');
   if (error) throw new Error(error.message);
@@ -847,7 +856,7 @@ export async function createApprovedJob(draft: NewJobDraft): Promise<Job> {
       urgency: draft.urgency,
       status: 'approved',
       agreed_price_inc_vat: price,
-      surcharge_multiplier: draft.urgency === 'out_of_hours' ? pricing().out_of_hours_multiplier : 1,
+      surcharge_multiplier: draft.urgency === 'out_of_hours' && canBookOutOfHours(draft.jobType) ? pricing().out_of_hours_multiplier : 1,
       assigned_technician_id: null,
       technician_accepted_at: null,
       scheduled_start: draft.slot?.start ?? null,
@@ -872,7 +881,7 @@ export async function createApprovedJob(draft: NewJobDraft): Promise<Job> {
       description: draft.description,
       urgency: draft.urgency,
       agreed_price_inc_vat: price,
-      surcharge_multiplier: draft.urgency === 'out_of_hours' ? pricing().out_of_hours_multiplier : 1,
+      surcharge_multiplier: draft.urgency === 'out_of_hours' && canBookOutOfHours(draft.jobType) ? pricing().out_of_hours_multiplier : 1,
       scheduled_start: draft.slot?.start ?? null,
       scheduled_end: draft.slot?.end ?? null,
     })
