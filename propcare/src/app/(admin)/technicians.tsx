@@ -1,11 +1,17 @@
 import { useFocusEffect } from 'expo-router';
 import { LockKeyhole, ShieldAlert, ShieldCheck, ShieldX } from 'lucide-react-native';
 import React, { useCallback, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, TextInput, View } from 'react-native';
 
+import { showDialog } from '@/components/dialog';
 import { Radius } from '@/constants/theme';
 import { usePalette } from '@/hooks/use-palette';
-import { listRegistryTechnicians, type Certification, type RegistryTechnician } from '@/lib/data';
+import {
+  listRegistryTechnicians,
+  setTechnicianPayRate,
+  type Certification,
+  type RegistryTechnician,
+} from '@/lib/data';
 
 function certState(cert: Certification): 'valid' | 'renew' | 'expired' {
   const days = Math.ceil((new Date(cert.expires_on).getTime() - Date.now()) / 86400000);
@@ -13,6 +19,72 @@ function certState(cert: Certification): 'valid' | 'renew' | 'expired' {
 }
 
 const TRADE_CERTS = ['niceic', 'napit', 'gas_safe'] as const;
+
+/**
+ * Cost per hour. Without it a job's margin is unknowable, and "per-job margin
+ * positive" is one of the four 90-day gate criteria (PRD §2).
+ */
+function PayRateRow({ tech, onSaved }: { tech: RegistryTechnician; onSaved: () => void }) {
+  const { colors: c, status } = usePalette();
+  const [value, setValue] = useState(tech.pay_rate_per_hour?.toString() ?? '');
+  const [saving, setSaving] = useState(false);
+
+  async function commit() {
+    const trimmed = value.trim();
+    const parsed = trimmed === '' ? null : Number(trimmed.replace(',', '.'));
+    if (parsed !== null && (!Number.isFinite(parsed) || parsed < 0)) {
+      showDialog('That rate looks wrong', 'Enter an hourly cost like 32.50, or clear it.');
+      setValue(tech.pay_rate_per_hour?.toString() ?? '');
+      return;
+    }
+    if (parsed === tech.pay_rate_per_hour) return;
+    setSaving(true);
+    try {
+      await setTechnicianPayRate(tech.id, parsed);
+      onSaved();
+    } catch (e) {
+      showDialog('Could not save the rate', e instanceof Error ? e.message : 'Try again.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const missing = tech.pay_rate_per_hour == null;
+
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+      <Text style={{ flex: 1, fontSize: 13, color: missing ? status.amber.fg : c.textSecondary }}>
+        {missing ? 'Cost per hour not set — jobs excluded from margin' : 'Cost per hour'}
+      </Text>
+      <Text style={{ fontSize: 13, color: c.textTertiary }}>£</Text>
+      <TextInput
+        value={value}
+        onChangeText={setValue}
+        onBlur={commit}
+        onSubmitEditing={commit}
+        editable={!saving}
+        placeholder="0.00"
+        placeholderTextColor={c.textTertiary}
+        keyboardType="decimal-pad"
+        style={{
+          borderWidth: 1.5,
+          borderColor: missing ? status.amber.dot : c.border,
+          borderRadius: 8,
+          borderCurve: 'continuous',
+          paddingVertical: 5,
+          paddingHorizontal: 10,
+          fontSize: 13.5,
+          fontWeight: '700',
+          color: c.text,
+          minWidth: 80,
+          textAlign: 'right',
+          fontVariant: ['tabular-nums'],
+          backgroundColor: c.background,
+        }}
+      />
+    </View>
+  );
+}
 
 /** Technician registry — expired documents visibly block assignment (design A4). */
 export default function TechnicianRegistry() {
@@ -115,6 +187,7 @@ export default function TechnicianRegistry() {
                 )}
               </View>
             </View>
+            <PayRateRow tech={tech} onSaved={load} />
             {tech.certifications.length === 0 ? (
               <Text style={{ fontSize: 12.5, color: c.textTertiary }}>No documents on file yet.</Text>
             ) : (

@@ -4,6 +4,7 @@ import { Text, View } from 'react-native';
 
 import { usePalette } from '@/hooks/use-palette';
 import { formatGBP } from '@/lib/job-status';
+import { incVatCaption } from '@/lib/pricing';
 
 type Props = {
   amount: number;
@@ -54,7 +55,10 @@ export function PriceDisplay({ amount, variant = 'inline', caption }: Props) {
           <Text style={{ fontSize: 30, fontWeight: '800' }}>.{pence}</Text>
         </Text>
         <Text style={{ fontSize: 13.5, fontWeight: '600', color: c.textSecondary }}>
-          {caption ?? "inc. VAT · no call-out fee · this is what you'll pay"}
+          {caption ??
+            [incVatCaption(), 'no call-out fee', "this is what you'll pay"]
+              .filter(Boolean)
+              .join(' · ')}
         </Text>
       </View>
     );

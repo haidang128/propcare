@@ -30,6 +30,7 @@ import {
   type Job,
 } from '@/lib/data';
 import { formatGBP } from '@/lib/job-status';
+import { incVatCaption } from '@/lib/pricing';
 
 /** Completion & payment — confirm, rate, pay; 72h auto-confirm noted (design 02 §8). */
 export default function CompletionAndPayment() {
@@ -221,7 +222,7 @@ export default function CompletionAndPayment() {
               </Text>
             </View>
             <Text style={{ fontSize: 12, color: c.textTertiary, textAlign: 'right', marginTop: -4 }}>
-              inc. VAT · the fixed price you approved
+              {incVatCaption() ? `${incVatCaption()} · ` : ''}the fixed price you approved
             </Text>
           </View>
         ) : null}

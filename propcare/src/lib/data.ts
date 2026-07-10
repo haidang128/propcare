@@ -1,7 +1,11 @@
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import type { JobStatus } from '@/lib/job-status';
+import { pricing } from '@/lib/pricing';
 
-/** Out-of-hours surcharge (PRD decision #11); config-level for P0. */
+/**
+ * Out-of-hours surcharge (PRD decision #11). The live value is admin-editable in
+ * `pricing_settings`; this is only the fallback used before settings load.
+ */
 export const OUT_OF_HOURS_MULTIPLIER = 1.75;
 
 export type Category = 'plumbing' | 'electrical' | 'handyman';
@@ -78,9 +82,11 @@ export type NewJobDraft = {
 };
 
 export function jobPrice(jobType: JobType, urgency: Urgency): number {
+  const { out_of_hours_multiplier, minimum_job_inc_vat } = pricing();
+  const base = Math.max(jobType.price_inc_vat, minimum_job_inc_vat);
   return urgency === 'out_of_hours'
-    ? Math.round(jobType.price_inc_vat * OUT_OF_HOURS_MULTIPLIER * 100) / 100
-    : jobType.price_inc_vat;
+    ? Math.round(base * out_of_hours_multiplier * 100) / 100
+    : base;
 }
 
 // ========== Demo fallback (preview mode, until Supabase schema is applied) ==========
@@ -109,7 +115,7 @@ const demo = {
   jobTypes: [
     { id: 'jt1', category: 'plumbing', name: 'Leaking / dripping tap', price_ex_vat: 150, price_inc_vat: 180 },
     { id: 'jt2', category: 'plumbing', name: 'Blocked drain / waste', price_ex_vat: 133.33, price_inc_vat: 160 },
-    { id: 'jt3', category: 'plumbing', name: 'No hot water — diagnose & fix', price_ex_vat: 183.33, price_inc_vat: 220 },
+    // No boiler/hot-water line: gas is deferred until Gas Safe vetting (PRD decision #6).
     { id: 'jt4', category: 'electrical', name: 'Socket not working', price_ex_vat: 116.67, price_inc_vat: 140 },
     { id: 'jt5', category: 'electrical', name: 'Light fitting replacement', price_ex_vat: 108.33, price_inc_vat: 130 },
     { id: 'jt6', category: 'handyman', name: 'Sticking / misaligned door', price_ex_vat: 79.17, price_inc_vat: 95 },
@@ -750,17 +756,17 @@ export async function listMyCertifications(): Promise<Certification[]> {
   return (data as Certification[]) ?? [];
 }
 
-/** Registry view: technicians + certs + on-call state (admin). */
-export type RegistryTechnician = Technician & { on_call: boolean };
+/** Registry view: technicians + certs + on-call state + cost (admin). */
+export type RegistryTechnician = Technician & { on_call: boolean; pay_rate_per_hour: number | null };
 
 export async function listRegistryTechnicians(): Promise<RegistryTechnician[]> {
   if (!isSupabaseConfigured) {
-    return demo.technicians.map((t, i) => ({ ...t, on_call: i === 0 }));
+    return demo.technicians.map((t, i) => ({ ...t, on_call: i === 0, pay_rate_per_hour: null }));
   }
   const { data, error } = await supabase!
     .from('profiles')
     .select(
-      'id, full_name, phone, certifications:technician_certifications(type, expires_on, verified), oncall:on_call_optins(active)',
+      'id, full_name, phone, pay_rate_per_hour, certifications:technician_certifications(type, expires_on, verified), oncall:on_call_optins(active)',
     )
     .eq('role', 'technician');
   if (error) throw new Error(error.message);
@@ -768,9 +774,43 @@ export async function listRegistryTechnicians(): Promise<RegistryTechnician[]> {
     id: t.id,
     full_name: t.full_name,
     phone: t.phone,
+    pay_rate_per_hour: t.pay_rate_per_hour == null ? null : Number(t.pay_rate_per_hour),
     certifications: t.certifications ?? [],
     on_call: Array.isArray(t.oncall) ? (t.oncall[0]?.active ?? false) : (t.oncall?.active ?? false),
   }));
+}
+
+/** Technician cost per hour — the missing input for per-job margin (PRD §2 gate). */
+export async function setTechnicianPayRate(technicianId: string, rate: number | null): Promise<void> {
+  if (!isSupabaseConfigured) return;
+  const { error } = await supabase!
+    .from('profiles')
+    .update({ pay_rate_per_hour: rate })
+    .eq('id', technicianId);
+  if (error) throw new Error(error.message);
+}
+
+/** The 90-day gate numbers (PRD §2) plus the leading indicators of §8. Admin only. */
+export type PilotMetrics = {
+  completed_jobs: number;
+  total_jobs: number;
+  variation_jobs: number;
+  variation_rate: number;
+  total_margin: number;
+  avg_margin: number;
+  jobs_missing_cost: number;
+  repeat_landlords: number;
+  cohort_landlords: number;
+  repeat_rate: number;
+};
+
+export async function getPilotMetrics(): Promise<PilotMetrics | null> {
+  if (!isSupabaseConfigured) return null;
+  const { data, error } = await supabase!.rpc('pilot_metrics');
+  if (error) throw new Error(error.message);
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row) return null;
+  return Object.fromEntries(Object.entries(row).map(([k, v]) => [k, Number(v)])) as PilotMetrics;
 }
 
 /** Signed URLs for a job's photos (private bucket; 1-hour links). */
@@ -807,7 +847,7 @@ export async function createApprovedJob(draft: NewJobDraft): Promise<Job> {
       urgency: draft.urgency,
       status: 'approved',
       agreed_price_inc_vat: price,
-      surcharge_multiplier: draft.urgency === 'out_of_hours' ? OUT_OF_HOURS_MULTIPLIER : 1,
+      surcharge_multiplier: draft.urgency === 'out_of_hours' ? pricing().out_of_hours_multiplier : 1,
       assigned_technician_id: null,
       technician_accepted_at: null,
       scheduled_start: draft.slot?.start ?? null,
@@ -832,7 +872,7 @@ export async function createApprovedJob(draft: NewJobDraft): Promise<Job> {
       description: draft.description,
       urgency: draft.urgency,
       agreed_price_inc_vat: price,
-      surcharge_multiplier: draft.urgency === 'out_of_hours' ? OUT_OF_HOURS_MULTIPLIER : 1,
+      surcharge_multiplier: draft.urgency === 'out_of_hours' ? pricing().out_of_hours_multiplier : 1,
       scheduled_start: draft.slot?.start ?? null,
       scheduled_end: draft.slot?.end ?? null,
     })

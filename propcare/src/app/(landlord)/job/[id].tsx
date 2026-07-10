@@ -8,6 +8,7 @@ import { Radius } from '@/constants/theme';
 import { usePalette } from '@/hooks/use-palette';
 import { getJob, type Job } from '@/lib/data';
 import { formatGBP, type JobStatus } from '@/lib/job-status';
+import { vatBreakdown } from '@/lib/pricing';
 
 const HAPPY_PATH: JobStatus[] = ['requested', 'priced', 'approved', 'scheduled', 'in_progress', 'completed', 'paid'];
 
@@ -62,8 +63,8 @@ export default function JobDetail() {
     );
   }
 
-  const exVat = job.job_type?.price_ex_vat;
-  const vat = exVat != null ? Math.round((job.agreed_price_inc_vat / 1.2) * 0.2 * 100) / 100 : null;
+  // null until VAT registration is recorded — we must not itemise tax we don't charge
+  const vat = vatBreakdown(job.agreed_price_inc_vat);
 
   return (
     <>
@@ -153,10 +154,15 @@ export default function JobDetail() {
           }}>
           {vat != null ? (
             <>
-              <Row label={`${job.job_type?.name} — flat rate${job.surcharge_multiplier > 1 ? ` (out-of-hours ×${job.surcharge_multiplier})` : ''}`} value={formatGBP(job.agreed_price_inc_vat - vat)} />
-              <Row label="VAT (20%)" value={formatGBP(vat)} />
+              <Row label={`${job.job_type?.name} — flat rate${job.surcharge_multiplier > 1 ? ` (out-of-hours ×${job.surcharge_multiplier})` : ''}`} value={formatGBP(vat.net)} />
+              <Row label={`VAT (${vat.ratePct}%)`} value={formatGBP(vat.vat)} />
             </>
-          ) : null}
+          ) : (
+            <Row
+              label={`${job.job_type?.name} — flat rate${job.surcharge_multiplier > 1 ? ` (out-of-hours ×${job.surcharge_multiplier})` : ''}`}
+              value={formatGBP(job.agreed_price_inc_vat)}
+            />
+          )}
           <View style={{ borderTopWidth: 1, borderTopColor: c.border, paddingTop: 7, flexDirection: 'row', justifyContent: 'space-between' }}>
             <Text style={{ fontSize: 14.5, fontWeight: '700', color: c.text }}>Fixed total</Text>
             <Text selectable style={{ fontSize: 14.5, fontWeight: '800', color: c.text, fontVariant: ['tabular-nums'] }}>

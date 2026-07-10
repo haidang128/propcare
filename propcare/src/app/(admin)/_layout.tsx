@@ -18,6 +18,7 @@ export default function AdminLayout() {
       <Stack.Screen name="variations" options={{ title: 'Variations' }} />
       <Stack.Screen name="variation/[id]" options={{ title: 'Review variation' }} />
       <Stack.Screen name="technicians" options={{ title: 'Technicians' }} />
+      <Stack.Screen name="metrics" options={{ title: '90-day gate' }} />
       <Stack.Screen
         name="assign/[jobId]"
         options={{

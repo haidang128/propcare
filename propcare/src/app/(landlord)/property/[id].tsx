@@ -11,6 +11,7 @@ import { usePalette } from '@/hooks/use-palette';
 import { getProperty, listPropertyHistory, type Category, type HistoryEntry, type Property } from '@/lib/data';
 import { downloadTextFile } from '@/lib/share';
 import { formatGBP, statusLabel } from '@/lib/job-status';
+import { incVatCaption } from '@/lib/pricing';
 
 const fmtDate = (iso: string) => new Date(iso).toLocaleDateString('en-GB');
 
@@ -23,7 +24,7 @@ function taxYearStart(): Date {
 
 function csvFor(property: Property, entries: HistoryEntry[]): string {
   const rows = [
-    ['Date', 'Job', 'Category', 'Reference', 'Status', 'Total (inc VAT)', 'Invoice status'],
+    ['Date', 'Job', 'Category', 'Reference', 'Status', `Total${incVatCaption() ? ' (inc VAT)' : ''}`, 'Invoice status'],
     ...entries.map((e) => [
       fmtDate(e.created_at),
       e.job_type?.name ?? e.description.slice(0, 40),
@@ -52,7 +53,7 @@ function pdfHtmlFor(property: Property, entries: HistoryEntry[]): string {
     <h1 style="font-size:20px; margin:0">PropCare — maintenance record</h1>
     <p style="color:#56646F; margin:4px 0 20px">${property.address_line1}, ${property.postcode} · generated ${fmtDate(new Date().toISOString())}</p>
     <table style="width:100%; border-collapse:collapse; font-size:12px">
-      <tr style="text-align:left; color:#8A96A1"><th>Date</th><th>Job</th><th>Ref</th><th>Status</th><th style="text-align:right">Total inc. VAT</th></tr>
+      <tr style="text-align:left; color:#8A96A1"><th>Date</th><th>Job</th><th>Ref</th><th>Status</th><th style="text-align:right">Total${incVatCaption() ? ' inc. VAT' : ''}</th></tr>
       ${rows}
     </table>
     </body></html>`;

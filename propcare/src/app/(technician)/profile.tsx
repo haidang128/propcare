@@ -5,6 +5,7 @@ import { ScrollView, Switch, Text, View } from 'react-native';
 import { Radius } from '@/constants/theme';
 import { usePalette } from '@/hooks/use-palette';
 import { getOnCall, listMyCertifications, setOnCall, type Certification } from '@/lib/data';
+import { pricing } from '@/lib/pricing';
 import { useAuth } from '@/lib/auth';
 
 const CERT_LABELS: Record<Certification['type'], string> = {
@@ -60,7 +61,7 @@ export default function TechnicianProfile() {
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 16, fontWeight: '800', color: c.text }}>On-call pool</Text>
             <Text style={{ fontSize: 13, color: c.textSecondary, lineHeight: 19 }}>
-              Get out-of-hours emergency jobs at 1.75× the day rate
+              Get out-of-hours emergency jobs at {pricing().out_of_hours_multiplier}× the day rate
             </Text>
           </View>
           <Switch value={onCall} onValueChange={toggle} />

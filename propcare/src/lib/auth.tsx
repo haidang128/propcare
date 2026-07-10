@@ -3,6 +3,7 @@ import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 
+import { loadPricingSettings } from '@/lib/pricing';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -48,6 +49,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let mounted = true;
 
     const loadRole = async (uid: string) => {
+      // pricing_settings is readable by any signed-in user; failures keep the
+      // conservative defaults in pricing.ts (unregistered for VAT, no floor)
+      loadPricingSettings().catch(() => {});
       const { data } = await sb.from('profiles').select('role').eq('id', uid).maybeSingle();
       if (!mounted) return;
       // the signup trigger creates the profile; a brief race right after

@@ -7,7 +7,8 @@ import { PrimaryButton } from '@/components/primary-button';
 import { StepBadge } from '@/components/step-badge';
 import { Radius } from '@/constants/theme';
 import { usePalette } from '@/hooks/use-palette';
-import { jobPrice, OUT_OF_HOURS_MULTIPLIER } from '@/lib/data';
+import { jobPrice } from '@/lib/data';
+import { incVatSuffix, pricing } from '@/lib/pricing';
 import { formatGBP } from '@/lib/job-status';
 import { useDraft } from '@/lib/new-request-draft';
 
@@ -48,7 +49,8 @@ export default function PickUrgency() {
             </Text>
           </View>
           <Text style={{ fontSize: 14, color: c.textSecondary, lineHeight: 21 }}>
-            Next available weekday slot — usually within 2 working days. Fixed price, inc. VAT.
+            Next available weekday slot — usually within 2 working days. Fixed price
+            {incVatSuffix() ? `,${incVatSuffix()}` : ''}.
           </Text>
         </Pressable>
 
@@ -79,7 +81,7 @@ export default function PickUrgency() {
             </Text>
           </View>
           <Text style={{ fontSize: 14, color: c.textSecondary, lineHeight: 21 }}>
-            An on-call engineer tonight or this weekend. ×{OUT_OF_HOURS_MULTIPLIER} surcharge,
+            An on-call engineer tonight or this weekend. ×{pricing().out_of_hours_multiplier} surcharge,
             still a fixed price.
           </Text>
           <View

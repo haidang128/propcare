@@ -1,5 +1,5 @@
 import { Link, Stack, useFocusEffect } from 'expo-router';
-import { BadgePlus, Inbox, TriangleAlert } from 'lucide-react-native';
+import { BadgePlus, ChartColumn, Inbox, TriangleAlert } from 'lucide-react-native';
 import React, { useCallback, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 
@@ -36,11 +36,17 @@ export default function AdminDispatch() {
     <Stack.Screen
       options={{
         headerRight: () => (
-          <View style={{ flexDirection: 'row', gap: 16 }}>
+          <View style={{ flexDirection: 'row', gap: 14, alignItems: 'center' }}>
             <Link href="/(admin)/variations" asChild>
               <Pressable hitSlop={8} style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                 <BadgePlus size={18} color={c.primary} />
                 <Text style={{ fontSize: 14, fontWeight: '700', color: c.primary }}>Variations</Text>
+              </Pressable>
+            </Link>
+            <Link href="/(admin)/metrics" asChild>
+              <Pressable hitSlop={8} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <ChartColumn size={17} color={c.primary} />
+                <Text style={{ fontSize: 14, fontWeight: '700', color: c.primary }}>Gate</Text>
               </Pressable>
             </Link>
             <Link href="/(admin)/technicians" asChild>

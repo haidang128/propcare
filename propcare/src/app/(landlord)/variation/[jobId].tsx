@@ -17,6 +17,7 @@ import {
   type Variation,
 } from '@/lib/data';
 import { formatGBP } from '@/lib/job-status';
+import { incVatCaption } from '@/lib/pricing';
 
 /**
  * Variation approval — the "no surprise bills" promise made real: the landlord
@@ -139,7 +140,7 @@ export default function VariationApproval() {
           </Text>
         </View>
         <Text style={{ fontSize: 12, color: c.textTertiary, textAlign: 'right', marginTop: -6 }}>
-          inc. VAT · checked by PropCare before reaching you
+          {incVatCaption() ? `${incVatCaption()} · ` : ''}checked by PropCare before reaching you
         </Text>
       </View>
 

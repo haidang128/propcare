@@ -18,6 +18,7 @@ import {
   type Variation,
 } from '@/lib/data';
 import { formatGBP } from '@/lib/job-status';
+import { incVatCaption, incVatSuffix } from '@/lib/pricing';
 
 /**
  * Variation review — admin prices the extra work and previews exactly what
@@ -138,7 +139,9 @@ export default function VariationReview() {
           </View>
         ) : null}
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={{ fontSize: 13.5, color: c.textSecondary }}>Your price (inc. VAT)</Text>
+          <Text style={{ fontSize: 13.5, color: c.textSecondary }}>
+            Your price{incVatSuffix() ? ` (${incVatCaption()})` : ''}
+          </Text>
           <TextInput
             value={price}
             onChangeText={setPrice}
