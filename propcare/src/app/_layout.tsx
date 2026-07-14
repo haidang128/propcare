@@ -64,6 +64,8 @@ export default function RootLayout() {
           <Stack.Screen name="(admin)" />
           {/* public tenant page — token in the URL is the credential */}
           <Stack.Screen name="visit/[token]" />
+          {/* public privacy policy — store listings + OAuth consent screen */}
+          <Stack.Screen name="privacy" />
         </Stack>
         <DialogHost />
       </AuthProvider>
