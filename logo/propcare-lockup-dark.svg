@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 80">
+<rect width="80" height="80" rx="18" fill="#7FB2E0"></rect>
+<g transform="translate(7.2,7.2) scale(0.656)" fill="none" stroke="#0C2036" stroke-width="8.5" stroke-linejoin="round" stroke-linecap="round">
+<path d="M21 48 L50 21 L79 48 L79 79 L21 79 Z"></path><path d="M37 56 L47 66.5 L64 46"></path>
+</g>
+<text x="98" y="54" font-family="&#39;Public Sans&#39;,system-ui,-apple-system,sans-serif" font-size="38" font-weight="800" letter-spacing="-0.8" fill="#EDF1F5">PropCare</text>
+</svg>

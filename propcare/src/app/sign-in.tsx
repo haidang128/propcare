@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { LockKeyhole, MailCheck, Radio, ShieldCheck } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
@@ -63,8 +64,16 @@ export default function SignIn() {
           paddingHorizontal: 14,
           alignSelf: 'flex-start',
           marginTop: 24,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 8,
         }}>
-        {/* Wordmark placeholder — final name TBD, keep swappable */}
+        {/* Wordmark — final name TBD, keep swappable */}
+        <Image
+          source={require('../../assets/brand/glyph-white.svg')}
+          style={{ width: 22, height: 22 }}
+          contentFit="contain"
+        />
         <Text style={{ color: '#FFFFFF', fontWeight: '800', fontSize: 19, letterSpacing: -0.4 }}>
           PropCare
         </Text>
@@ -237,6 +246,19 @@ export default function SignIn() {
         <Text style={{ color: '#FFFFFF', opacity: 0.75, fontSize: 12, textAlign: 'center' }}>
           No subscription — you only pay for jobs you book
         </Text>
+        <Pressable onPress={() => router.push('/privacy')} hitSlop={8}>
+          <Text
+            style={{
+              color: '#FFFFFF',
+              opacity: 0.6,
+              fontSize: 12,
+              fontWeight: '600',
+              textAlign: 'center',
+              textDecorationLine: 'underline',
+            }}>
+            Privacy policy
+          </Text>
+        </Pressable>
 
         {previewMode ? (
           <View style={{ marginTop: 16, gap: 8 }}>
