@@ -1,9 +1,10 @@
-import { Link, Stack, useFocusEffect } from 'expo-router';
-import { CalendarDays, Check, KeyRound } from 'lucide-react-native';
+import { Link, useFocusEffect } from 'expo-router';
+import { CalendarDays, Check, KeyRound, UserRound } from 'lucide-react-native';
 import React, { useCallback, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 
 import { showDialog } from '@/components/dialog';
+import { NavRow, type NavItem } from '@/components/nav-row';
 import { StatusChip } from '@/components/status-chip';
 import { useJobsRealtime } from '@/hooks/use-jobs-realtime';
 import { usePalette } from '@/hooks/use-palette';
@@ -16,6 +17,10 @@ function timeWindow(job: Job): { big: string; small: string } {
   const t = (d: Date) => d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
   return { big: t(s), small: e ? `–${t(e)}` : '' };
 }
+
+const TECHNICIAN_SECTIONS: NavItem[] = [
+  { href: '/(technician)/profile', label: 'Profile & certifications', icon: UserRound },
+];
 
 /** Technician today — big targets, glanceable, access details up front (design T1). */
 export default function TechnicianToday() {
@@ -48,18 +53,6 @@ export default function TechnicianToday() {
   }
 
   return (
-    <>
-    <Stack.Screen
-      options={{
-        headerRight: () => (
-          <Link href="/(technician)/profile" asChild>
-            <Pressable hitSlop={8}>
-              <Text style={{ fontSize: 14, fontWeight: '700', color: c.primary }}>Profile</Text>
-            </Pressable>
-          </Link>
-        ),
-      }}
-    />
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
       style={{ flex: 1, backgroundColor: c.background }}
@@ -74,6 +67,8 @@ export default function TechnicianToday() {
         />
       }
       contentContainerStyle={{ padding: 20, gap: 12 }}>
+      <NavRow items={TECHNICIAN_SECTIONS} />
+
       {jobs !== null && jobs.length === 0 ? (
         <View
           style={{
@@ -200,6 +195,5 @@ export default function TechnicianToday() {
         );
       })}
     </ScrollView>
-    </>
   );
 }

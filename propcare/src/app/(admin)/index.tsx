@@ -1,14 +1,21 @@
-import { Link, Stack, useFocusEffect } from 'expo-router';
-import { BadgePlus, ChartColumn, Inbox, TriangleAlert } from 'lucide-react-native';
+import { Link, useFocusEffect } from 'expo-router';
+import { BadgePlus, ChartColumn, Inbox, TriangleAlert, Users } from 'lucide-react-native';
 import React, { useCallback, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 
+import { NavRow, type NavItem } from '@/components/nav-row';
 import { PriceDisplay } from '@/components/price-display';
 import { StatusChip } from '@/components/status-chip';
 import { Radius } from '@/constants/theme';
 import { useJobsRealtime } from '@/hooks/use-jobs-realtime';
 import { usePalette } from '@/hooks/use-palette';
 import { listIncomingJobs, type Job } from '@/lib/data';
+
+const ADMIN_SECTIONS: NavItem[] = [
+  { href: '/(admin)/variations', label: 'Variations', icon: BadgePlus },
+  { href: '/(admin)/technicians', label: 'Technicians', icon: Users },
+  { href: '/(admin)/metrics', label: '90-day gate', icon: ChartColumn },
+];
 
 /** Dispatch — incoming requests oldest-first; emergencies flagged amber (design A1 subset). */
 export default function AdminDispatch() {
@@ -32,32 +39,6 @@ export default function AdminDispatch() {
   useJobsRealtime(load);
 
   return (
-    <>
-    <Stack.Screen
-      options={{
-        headerRight: () => (
-          <View style={{ flexDirection: 'row', gap: 14, alignItems: 'center' }}>
-            <Link href="/(admin)/variations" asChild>
-              <Pressable hitSlop={8} style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                <BadgePlus size={18} color={c.primary} />
-                <Text style={{ fontSize: 14, fontWeight: '700', color: c.primary }}>Variations</Text>
-              </Pressable>
-            </Link>
-            <Link href="/(admin)/metrics" asChild>
-              <Pressable hitSlop={8} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                <ChartColumn size={17} color={c.primary} />
-                <Text style={{ fontSize: 14, fontWeight: '700', color: c.primary }}>Gate</Text>
-              </Pressable>
-            </Link>
-            <Link href="/(admin)/technicians" asChild>
-              <Pressable hitSlop={8}>
-                <Text style={{ fontSize: 14, fontWeight: '700', color: c.primary }}>Techs</Text>
-              </Pressable>
-            </Link>
-          </View>
-        ),
-      }}
-    />
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
       style={{ flex: 1, backgroundColor: c.background }}
@@ -78,6 +59,8 @@ export default function AdminDispatch() {
         width: '100%',
         alignSelf: 'center',
       }}>
+      <NavRow items={ADMIN_SECTIONS} />
+
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <Text style={{ fontSize: 16, fontWeight: '700', color: c.text }}>
           Incoming requests{jobs ? ` — ${jobs.length}` : ''}
@@ -184,6 +167,5 @@ export default function AdminDispatch() {
         );
       })}
     </ScrollView>
-    </>
   );
 }

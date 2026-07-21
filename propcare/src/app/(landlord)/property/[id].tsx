@@ -6,6 +6,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Platform, Pressable, ScrollView, Share, Text, View } from 'react-native';
 
 import { showDialog } from '@/components/dialog';
+import { HeaderRight } from '@/components/header-right';
 import { Radius } from '@/constants/theme';
 import { usePalette } from '@/hooks/use-palette';
 import { getProperty, listPropertyHistory, type Category, type HistoryEntry, type Property } from '@/lib/data';
@@ -129,10 +130,15 @@ export default function PropertyHistory() {
         options={{
           title: property?.address_line1 ?? 'Property',
           headerRight: () => (
-            <Pressable onPress={exportRecord} hitSlop={8} style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-              <Download size={16} color={c.primary} />
-              <Text style={{ fontSize: 13, fontWeight: '700', color: c.primary }}>PDF / CSV</Text>
-            </Pressable>
+            <HeaderRight>
+              <Pressable
+                onPress={exportRecord}
+                hitSlop={8}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                <Download size={16} color={c.primary} />
+                <Text style={{ fontSize: 13, fontWeight: '700', color: c.primary }}>PDF / CSV</Text>
+              </Pressable>
+            </HeaderRight>
           ),
         }}
       />
