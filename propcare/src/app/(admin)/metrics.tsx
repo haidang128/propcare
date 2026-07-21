@@ -99,8 +99,8 @@ export default function PilotMetricsScreen() {
       met: m.completed_jobs === 0 ? null : m.avg_margin > 0,
       note:
         m.jobs_missing_cost > 0
-          ? `${m.jobs_missing_cost} completed job${m.jobs_missing_cost > 1 ? 's' : ''} cost nothing in labour here, so margin is overstated. On-site time comes from the job timeline — a job only accrues it while it is in progress.`
-          : `Total ${formatGBP(m.total_margin)} across ${m.completed_jobs} job${m.completed_jobs === 1 ? '' : 's'}.`,
+          ? `${m.jobs_missing_cost} completed job${m.jobs_missing_cost > 1 ? 's have' : ' has'} no agreed price, so margin cannot be worked out for ${m.jobs_missing_cost > 1 ? 'them' : 'it'}.`
+          : `Total ${formatGBP(m.total_margin)} across ${m.completed_jobs} job${m.completed_jobs === 1 ? '' : 's'}. Labour is the technician payout share of each price.`,
     },
     {
       label: '30-day repeat booking rate',
@@ -128,7 +128,8 @@ export default function PilotMetricsScreen() {
       contentContainerStyle={{ padding: 20, gap: 12, maxWidth: 800, width: '100%', alignSelf: 'center' }}>
       <Text style={{ fontSize: 13, color: c.textSecondary, lineHeight: 19 }}>
         The four criteria that decide whether to keep investing after 90 days. Margin is revenue
-        net of VAT (when registered), technician time, materials, and platform overhead.
+        net of VAT (when registered), the technician payout share, materials, and platform
+        overhead. It does not carry your own dispatch time.
       </Text>
 
       {m.jobs_missing_cost > 0 ? (
@@ -143,10 +144,9 @@ export default function PilotMetricsScreen() {
           }}>
           <TriangleAlert size={17} color={status.amber.fg} style={{ marginTop: 1 }} />
           <Text style={{ flex: 1, fontSize: 13.5, fontWeight: '700', color: status.amber.fg, lineHeight: 20 }}>
-            Margin is not trustworthy yet — {m.jobs_missing_cost} completed job
-            {m.jobs_missing_cost > 1 ? 's have' : ' has'} no labour cost. That means either no cost
-            per hour on the technician in the registry, or no recorded on-site time because the job
-            never ran through Start and Mark done.
+            Margin is incomplete — {m.jobs_missing_cost} completed job
+            {m.jobs_missing_cost > 1 ? 's have' : ' has'} no agreed price, so there is nothing to
+            take the technician payout share of.
           </Text>
         </View>
       ) : null}
