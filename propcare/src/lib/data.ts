@@ -513,17 +513,66 @@ export async function flagVariation(
 }
 
 /** Admin queue: variations awaiting review. */
+/**
+ * The office queue. Two kinds of work land here:
+ *  - 'flagged'/'admin_review': needs pricing before it reaches the landlord.
+ *  - 'declined' while the job is still paused: the landlord said no, and by
+ *    policy that pauses the job at no charge for the office to rearrange or
+ *    cancel. Without this second case the job appears in no queue at all —
+ *    the landlord sees nothing pending, the technician's buttons are all
+ *    disabled, and only a manual database edit would unstick it.
+ */
 export async function listPendingVariations(): Promise<Variation[]> {
   if (!isSupabaseConfigured) {
-    return demoVariations.filter((v) => v.status === 'flagged' || v.status === 'admin_review');
+    return demoVariations.filter(
+      (v) =>
+        v.status === 'flagged' ||
+        v.status === 'admin_review' ||
+        (v.status === 'declined' &&
+          demo.jobs.find((j) => j.id === v.job_id)?.status === 'variation_pending'),
+    );
   }
   const { data, error } = await supabase!
     .from('variations')
     .select('*, job:jobs(*, property:properties(*), job_type:job_types(*))')
-    .in('status', ['flagged', 'admin_review'])
+    .in('status', ['flagged', 'admin_review', 'declined'])
     .order('created_at');
   if (error) throw new Error(error.message);
-  return data as Variation[];
+  // a declined variation only needs the office while its job is still paused
+  return (data as Variation[]).filter(
+    (v) => v.status !== 'declined' || v.job?.status === 'variation_pending',
+  );
+}
+
+/** True when this variation is a landlord decline still waiting on the office. */
+export function needsOfficeResolution(v: Variation): boolean {
+  return v.status === 'declined' && v.job?.status === 'variation_pending';
+}
+
+/**
+ * Office resolution after a landlord declines: resume the original scope at the
+ * original price, or call the job off. Both are admin-only in the database.
+ */
+export async function resolveDeclinedVariation(
+  variation: Variation,
+  outcome: 'resume' | 'cancel',
+): Promise<void> {
+  const to: JobStatus = outcome === 'resume' ? 'in_progress' : 'cancelled';
+  const note =
+    outcome === 'resume'
+      ? 'Landlord declined the extra work — job resumes at the original price and original scope'
+      : 'Landlord declined the extra work — job cancelled by the office, nothing charged';
+  if (!isSupabaseConfigured) {
+    const j = demo.jobs.find((x) => x.id === variation.job_id);
+    if (j) j.status = to;
+    return;
+  }
+  const { error } = await supabase!.rpc('transition_job', {
+    p_job_id: variation.job_id,
+    p_to: to,
+    p_note: note,
+  });
+  if (error) throw new Error(error.message);
 }
 
 export async function getVariation(id: string): Promise<Variation | null> {

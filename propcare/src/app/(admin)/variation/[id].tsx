@@ -13,7 +13,9 @@ import { usePalette } from '@/hooks/use-palette';
 import {
   getJobPhotoUrls,
   getVariation,
+  needsOfficeResolution,
   rejectVariation,
+  resolveDeclinedVariation,
   sendVariationToLandlord,
   type Variation,
 } from '@/lib/data';
@@ -51,6 +53,34 @@ export default function VariationReview() {
   const parsedPrice = parseFloat(price.replace(',', '.'));
   const priceValid = Number.isFinite(parsedPrice) && parsedPrice > 0;
   const newTotal = priceValid ? variation.old_job_price_inc_vat + parsedPrice : null;
+  const declined = needsOfficeResolution(variation);
+
+  function resolve(outcome: 'resume' | 'cancel') {
+    showDialog(
+      outcome === 'resume' ? 'Resume the original job?' : 'Cancel this job?',
+      outcome === 'resume'
+        ? 'The technician carries on with the original scope at the original price. The declined extra work is not done and is not charged.'
+        : 'The job is called off and nothing is charged. Use this when the original scope no longer makes sense without the extra work.',
+      [
+        { text: 'Back', style: 'cancel' },
+        {
+          text: outcome === 'resume' ? 'Resume job' : 'Cancel job',
+          style: outcome === 'cancel' ? 'destructive' : 'default',
+          onPress: async () => {
+            setBusy(true);
+            try {
+              await resolveDeclinedVariation(variation!, outcome);
+              router.back();
+            } catch (e) {
+              showDialog('Could not update the job', e instanceof Error ? e.message : 'Try again.');
+            } finally {
+              setBusy(false);
+            }
+          },
+        },
+      ],
+    );
+  }
 
   async function send() {
     if (!priceValid || !variation) return;
@@ -103,7 +133,14 @@ export default function VariationReview() {
         flexGrow: 1,
       }}>
       <View style={{ gap: 6 }}>
-        <StatusChip status="variation_pending" label="Job paused — technician waiting on site" />
+        <StatusChip
+          status="variation_pending"
+          label={
+            declined
+              ? 'Landlord declined — job paused, waiting on you'
+              : 'Job paused — technician waiting on site'
+          }
+        />
         <Text style={{ fontSize: 20, fontWeight: '800', color: c.text }}>{variation.note}</Text>
         <Text style={{ fontSize: 13, color: c.textSecondary }}>
           {variation.job?.reference} · {variation.job?.job_type?.name} ·{' '}
@@ -119,8 +156,33 @@ export default function VariationReview() {
         </View>
       ) : null}
 
+      {declined ? (
+        <View
+          style={{
+            backgroundColor: status.red.bg,
+            borderRadius: Radius.card,
+            borderCurve: 'continuous',
+            padding: 16,
+            gap: 8,
+          }}>
+          <Text style={{ fontSize: 13.5, fontWeight: '800', color: status.red.fg }}>
+            The landlord turned this extra work down
+          </Text>
+          <Text style={{ fontSize: 13.5, color: c.text, lineHeight: 20 }}>
+            Nothing is charged for the extra work. The job is paused at its original price of{' '}
+            {formatGBP(variation.old_job_price_inc_vat)}, and the technician cannot do anything on
+            site until you decide.
+          </Text>
+          <Text style={{ fontSize: 13, color: c.textSecondary, lineHeight: 19 }}>
+            Resume if the original job still makes sense on its own. Cancel if it does not — for
+            example when the fault cannot be fixed without the work that was declined.
+          </Text>
+        </View>
+      ) : null}
+
       <View
         style={{
+          display: declined ? 'none' : 'flex',
           backgroundColor: c.backgroundElement,
           borderWidth: 1,
           borderColor: c.border,
@@ -169,6 +231,7 @@ export default function VariationReview() {
 
       <View
         style={{
+          display: declined ? 'none' : 'flex',
           backgroundColor: c.primaryTint,
           borderWidth: 1.5,
           borderColor: c.primaryTintBorder,
@@ -212,10 +275,30 @@ export default function VariationReview() {
       </View>
 
       <View style={{ marginTop: 'auto', gap: 8 }}>
-        <PrimaryButton label="Approve & send to landlord" disabled={!priceValid} loading={busy} onPress={send} />
-        <Pressable onPress={reject} disabled={busy} style={{ minHeight: 44, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontSize: 14.5, fontWeight: '700', color: status.red.fg }}>Reject variation</Text>
-        </Pressable>
+        {declined ? (
+          <>
+            <PrimaryButton
+              label="Resume job at original price"
+              loading={busy}
+              onPress={() => resolve('resume')}
+            />
+            <Pressable
+              onPress={() => resolve('cancel')}
+              disabled={busy}
+              style={{ minHeight: 44, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 14.5, fontWeight: '700', color: status.red.fg }}>
+                Cancel the job — nothing charged
+              </Text>
+            </Pressable>
+          </>
+        ) : (
+          <>
+            <PrimaryButton label="Approve & send to landlord" disabled={!priceValid} loading={busy} onPress={send} />
+            <Pressable onPress={reject} disabled={busy} style={{ minHeight: 44, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 14.5, fontWeight: '700', color: status.red.fg }}>Reject variation</Text>
+            </Pressable>
+          </>
+        )}
       </View>
     </ScrollView>
   );

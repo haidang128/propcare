@@ -58,8 +58,15 @@ const re = await fetch(`${URL}/rest/v1/profiles?id=eq.${user.id}`, { method: 'PA
 const reAfter = await j(await fetch(`${URL}/rest/v1/profiles?id=eq.${user.id}&select=role`, { headers: SH }));
 check('role escalation still blocked', re.status >= 400 || reAfter[0]?.role === 'landlord', `HTTP ${re.status}, role ${reAfter[0]?.role}`);
 
-// cleanup
-if (job) { await fetch(`${URL}/rest/v1/job_events?job_id=eq.${job.id}`, { method: 'DELETE', headers: SH }); await fetch(`${URL}/rest/v1/jobs?id=eq.${job.id}`, { method: 'DELETE', headers: SH }); }
+// cleanup — invoices first: this test drives a job through 'completed', which
+// auto-creates an invoice whose FK otherwise blocks the whole delete chain and
+// strands a profile row in prod.
+if (job) {
+  await fetch(`${URL}/rest/v1/invoices?job_id=eq.${job.id}`, { method: 'DELETE', headers: SH });
+  await fetch(`${URL}/rest/v1/ratings?job_id=eq.${job.id}`, { method: 'DELETE', headers: SH });
+  await fetch(`${URL}/rest/v1/job_events?job_id=eq.${job.id}`, { method: 'DELETE', headers: SH });
+  await fetch(`${URL}/rest/v1/jobs?id=eq.${job.id}`, { method: 'DELETE', headers: SH });
+}
 await fetch(`${URL}/rest/v1/properties?id=eq.${propId}`, { method: 'DELETE', headers: SH });
 await fetch(`${URL}/auth/v1/admin/users/${user.id}`, { method: 'DELETE', headers: SH });
 const residue = await j(await fetch(`${URL}/rest/v1/profiles?id=eq.${user.id}&select=id`, { headers: SH }));
