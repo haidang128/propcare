@@ -99,7 +99,7 @@ export default function PilotMetricsScreen() {
       met: m.completed_jobs === 0 ? null : m.avg_margin > 0,
       note:
         m.jobs_missing_cost > 0
-          ? `${m.jobs_missing_cost} completed job${m.jobs_missing_cost > 1 ? 's' : ''} have no technician cost per hour — margin is overstated until you set it in the registry.`
+          ? `${m.jobs_missing_cost} completed job${m.jobs_missing_cost > 1 ? 's' : ''} cost nothing in labour here, so margin is overstated. On-site time comes from the job timeline — a job only accrues it while it is in progress.`
           : `Total ${formatGBP(m.total_margin)} across ${m.completed_jobs} job${m.completed_jobs === 1 ? '' : 's'}.`,
     },
     {
@@ -143,7 +143,10 @@ export default function PilotMetricsScreen() {
           }}>
           <TriangleAlert size={17} color={status.amber.fg} style={{ marginTop: 1 }} />
           <Text style={{ flex: 1, fontSize: 13.5, fontWeight: '700', color: status.amber.fg, lineHeight: 20 }}>
-            Margin is not trustworthy yet — set a cost per hour for every technician in the registry.
+            Margin is not trustworthy yet — {m.jobs_missing_cost} completed job
+            {m.jobs_missing_cost > 1 ? 's have' : ' has'} no labour cost. That means either no cost
+            per hour on the technician in the registry, or no recorded on-site time because the job
+            never ran through Start and Mark done.
           </Text>
         </View>
       ) : null}
