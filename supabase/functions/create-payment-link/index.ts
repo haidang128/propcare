@@ -49,23 +49,36 @@ Deno.serve(async (req) => {
 
     const { data: invoice } = await service
       .from('invoices')
-      .select('id, number, total_inc_vat, status, stripe_payment_link')
+      .select('id, number, total_inc_vat, status, stripe_payment_link, stripe_payment_link_expires_at')
       .eq('job_id', job_id)
       .maybeSingle();
     if (!invoice) return json(409, { error: 'no invoice yet — job not completed' });
     if (invoice.status === 'disputed') return json(409, { error: 'invoice is disputed — payment is on hold' });
-    if (invoice.status === 'paid' || invoice.status === 'auto_captured') {
-      return json(409, { error: 'already paid' });
+    // Only 'paid' means the money arrived. 'auto_captured' means the 72h dispute
+    // window closed with nothing captured (no card on file at P0) — the invoice
+    // is still owed and must stay payable, exactly as the 0006 cron states.
+    if (invoice.status === 'paid') return json(409, { error: 'already paid' });
+
+    // Reuse the cached Checkout URL only while it is still alive. Stripe
+    // sessions expire 24h after creation; a stale one is a dead end.
+    const cachedExpiry = invoice.stripe_payment_link_expires_at
+      ? Date.parse(invoice.stripe_payment_link_expires_at)
+      : 0;
+    if (invoice.stripe_payment_link && cachedExpiry > Date.now() + 5 * 60_000) {
+      return json(200, { url: invoice.stripe_payment_link });
     }
-    if (invoice.stripe_payment_link) return json(200, { url: invoice.stripe_payment_link });
 
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
     if (!stripeKey) return json(501, { error: 'payments not configured yet' });
 
     const stripe = new Stripe(stripeKey);
     const appUrl = Deno.env.get('APP_URL') ?? 'http://localhost:8081';
+    // Stripe's own maximum is 24h from creation; be explicit so the expiry we
+    // store is the one Stripe will actually enforce.
+    const expiresAt = Math.floor(Date.now() / 1000) + 24 * 60 * 60 - 60;
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
+      expires_at: expiresAt,
       line_items: [
         {
           quantity: 1,
@@ -85,7 +98,12 @@ Deno.serve(async (req) => {
 
     await service
       .from('invoices')
-      .update({ stripe_payment_link: session.url })
+      .update({
+        stripe_payment_link: session.url,
+        stripe_payment_link_expires_at: new Date(
+          (session.expires_at ?? expiresAt) * 1000,
+        ).toISOString(),
+      })
       .eq('id', invoice.id);
 
     return json(200, { url: session.url });

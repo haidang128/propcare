@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Linking,
+  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -81,7 +82,15 @@ export default function CompletionAndPayment() {
       }
       const { url, error } = await requestPaymentLink(job!.id);
       if (url) {
-        await Linking.openURL(url);
+        if (Platform.OS === 'web') {
+          // Linking.openURL is window.open on web, and this runs after an await
+          // so it is outside the click's user-gesture stack — desktop browsers
+          // block it silently. Stripe returns to success_url/cancel_url, so
+          // navigating this tab is both unblockable and the intended flow.
+          window.location.assign(url);
+        } else {
+          await Linking.openURL(url);
+        }
       } else if (error) {
         showDialog('Payment', error);
       }
