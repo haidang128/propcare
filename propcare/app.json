@@ -10,7 +10,10 @@
     "ios": {
       "icon": "./assets/brand/icon-1024.png",
       "bundleIdentifier": "com.propcare.app",
-      "usesAppleSignIn": true
+      "usesAppleSignIn": true,
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -40,7 +43,16 @@
       "expo-font",
       "expo-sharing",
       "expo-web-browser",
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "PropCare needs access to your photos so you can attach pictures of the problem to a repair request, and so technicians can upload before-and-after photos of the work.",
+          "cameraPermission": "PropCare needs access to your camera so you can photograph the problem when raising a repair request, and so technicians can photograph completed work.",
+          "microphonePermission": false
+        }
+      ],
+      "expo-status-bar"
     ],
     "experiments": {
       "typedRoutes": true,
