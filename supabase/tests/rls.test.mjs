@@ -87,7 +87,10 @@ try {
   });
   ids.props = [propA.body[0].id, propB.body[0].id];
 
-  const jt = (await as(tA, '/rest/v1/job_types?select=id,category,price_inc_vat&limit=20')).body;
+  // active only: retired cards stay in the table for historic jobs (rate card
+  // v1 in 0015 deactivated the whole v0 seed rather than deleting it), and
+  // guard_job_insert rightly refuses to book an inactive job type.
+  const jt = (await as(tA, '/rest/v1/job_types?select=id,category,price_inc_vat&active=eq.true&limit=40')).body;
   const plumbType = jt.find((x) => x.category === 'plumbing');
   const elecType = jt.find((x) => x.category === 'electrical');
 
