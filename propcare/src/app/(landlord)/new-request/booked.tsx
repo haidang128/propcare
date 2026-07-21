@@ -82,7 +82,10 @@ export default function Booked() {
           label="Back to home"
           variant="secondary"
           onPress={() => {
-            draft.reset();
+            // No draft.reset() here: the earlier wizard steps are still mounted
+            // below this screen and read `draft.jobType!`, so clearing the draft
+            // while they are alive crashes them. Leaving the wizard unmounts
+            // DraftProvider, which discards the draft anyway.
             router.dismissTo('/(landlord)');
           }}
         />

@@ -1,4 +1,4 @@
-import { router, Stack } from 'expo-router';
+import { Redirect, router, Stack } from 'expo-router';
 import { TriangleAlert } from 'lucide-react-native';
 import React, { useEffect } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
@@ -16,8 +16,8 @@ import { useDraft } from '@/lib/new-request-draft';
 export default function PickUrgency() {
   const { colors: c, status } = usePalette();
   const draft = useDraft();
-  const jobType = draft.jobType!;
-  const offerOutOfHours = canBookOutOfHours(jobType);
+  const jobType = draft.jobType;
+  const offerOutOfHours = jobType ? canBookOutOfHours(jobType) : false;
 
   // A draft can carry an out-of-hours choice from a previous, eligible job type.
   // The database would reject the insert; reset it here so the price is honest.
@@ -26,6 +26,10 @@ export default function PickUrgency() {
       draft.update({ urgency: 'standard' });
     }
   }, [offerOutOfHours, draft]);
+
+  // On web the URL is real: a refresh, a bookmark or browser back/forward can
+  // land here with an empty draft. Start the wizard over rather than crash.
+  if (!jobType) return <Redirect href="/(landlord)/new-request" />;
 
   return (
     <>

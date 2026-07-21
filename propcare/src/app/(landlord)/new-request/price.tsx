@@ -1,4 +1,4 @@
-import { router, Stack } from 'expo-router';
+import { Redirect, router, Stack } from 'expo-router';
 import { Check } from 'lucide-react-native';
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
@@ -44,8 +44,7 @@ function upcomingSlots(): Slot[] {
 export default function PriceApproval() {
   const { colors: c, status } = usePalette();
   const draft = useDraft();
-  const jobType = draft.jobType!;
-  const price = jobPrice(jobType, draft.urgency);
+  const jobType = draft.jobType;
   const slots = useMemo(() => upcomingSlots(), []);
   const [slotIndex, setSlotIndex] = useState(0);
   const [booking, setBooking] = useState(false);
@@ -56,7 +55,7 @@ export default function PriceApproval() {
       const slot = slots[slotIndex];
       const job = await createApprovedJob({
         property: draft.property!,
-        jobType,
+        jobType: jobType!, // guarded below; this only runs from the rendered form
         description: draft.description,
         photoUris: draft.photoUris,
         urgency: draft.urgency,
@@ -71,6 +70,11 @@ export default function PriceApproval() {
     }
   }
 
+  // On web the URL is real: a refresh, a bookmark or browser back/forward can
+  // land here with an empty draft. Start the wizard over rather than crash.
+  if (!jobType || !draft.property) return <Redirect href="/(landlord)/new-request" />;
+
+  const price = jobPrice(jobType, draft.urgency);
   const included = [
     jobType.name,
     'All labour + standard parts up to £20',

@@ -1,4 +1,4 @@
-import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { Redirect, router, Stack, useLocalSearchParams } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import { Camera } from 'lucide-react-native';
@@ -36,6 +36,10 @@ export default function DescribeIssue() {
       draft.update({ photoUris: [...draft.photoUris, result.assets[0].uri] });
     }
   }
+
+  // On web the URL is real: a refresh or a bookmark can land here with an empty
+  // draft, leaving a step with no property and no job types to choose from.
+  if (!draft.property || !category) return <Redirect href="/(landlord)/new-request" />;
 
   return (
     <>

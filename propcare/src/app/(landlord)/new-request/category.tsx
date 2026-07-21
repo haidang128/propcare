@@ -1,4 +1,4 @@
-import { router, Stack } from 'expo-router';
+import { Redirect, router, Stack } from 'expo-router';
 import { Droplets, Hammer, LockKeyhole, ShieldCheck, Zap } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
@@ -27,6 +27,10 @@ export default function PickCategory() {
   useEffect(() => {
     listJobTypes().then(setJobTypes).catch(() => {});
   }, []);
+
+  // On web the URL is real: a refresh or a bookmark can land here with no
+  // property picked, which the later steps require. Start the wizard over.
+  if (!draft.property) return <Redirect href="/(landlord)/new-request" />;
 
   function fromPrice(category: Category): string | null {
     const prices = jobTypes.filter((t) => t.category === category).map((t) => t.price_inc_vat);
