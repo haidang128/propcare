@@ -10,11 +10,9 @@ export default function LandlordLayout() {
   if (loading) return null;
   if (!role) return <Redirect href="/sign-in" />;
   return (
-    <Stack>
-      <Stack.Screen
-        name="index"
-        options={{ title: 'PropCare', headerLargeTitle: true, headerRight: () => <HeaderSignOut /> }}
-      />
+    // headerRight on the layout, so every screen in the group carries it
+    <Stack screenOptions={{ headerRight: () => <HeaderSignOut /> }}>
+      <Stack.Screen name="index" options={{ title: 'PropCare', headerLargeTitle: true }} />
       <Stack.Screen name="add-property" options={{ title: 'Add a property' }} />
       {/* the wizard renders its own stack + headers */}
       <Stack.Screen name="new-request" options={{ headerShown: false }} />

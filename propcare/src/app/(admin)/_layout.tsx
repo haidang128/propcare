@@ -10,11 +10,11 @@ export default function AdminLayout() {
   if (loading) return null;
   if (!role) return <Redirect href="/sign-in" />;
   return (
-    <Stack>
-      <Stack.Screen
-        name="index"
-        options={{ title: 'Dispatch', headerLargeTitle: true, headerRight: () => <HeaderSignOut /> }}
-      />
+    // Sign-out sits on the layout so it is on every screen in the group: a
+    // landlord who deep-links or refreshes onto a sub-screen has no back stack,
+    // and had no way out of the app at all.
+    <Stack screenOptions={{ headerRight: () => <HeaderSignOut /> }}>
+      <Stack.Screen name="index" options={{ title: 'Dispatch', headerLargeTitle: true }} />
       <Stack.Screen name="variations" options={{ title: 'Variations' }} />
       <Stack.Screen name="variation/[id]" options={{ title: 'Review variation' }} />
       <Stack.Screen name="technicians" options={{ title: 'Technicians' }} />

@@ -90,7 +90,13 @@ export default function PilotMetricsScreen() {
       label: 'Completed jobs',
       value: String(m.completed_jobs),
       target: '≥ 30',
-      met: m.completed_jobs >= 30,
+      // "Below target" on day one is not a finding, it is arithmetic. Until a
+      // job has actually finished there is nothing to judge.
+      met: m.completed_jobs === 0 ? null : m.completed_jobs >= 30,
+      note:
+        m.completed_jobs === 0
+          ? `${m.total_jobs} job${m.total_jobs === 1 ? '' : 's'} booked so far, none finished yet. This counts jobs the technician has marked done.`
+          : `${30 - m.completed_jobs > 0 ? `${30 - m.completed_jobs} to go.` : 'Target met.'}`,
     },
     {
       label: 'Per-job margin (completed + paid)',
@@ -131,6 +137,28 @@ export default function PilotMetricsScreen() {
         net of VAT (when registered), the technician payout share, materials, and platform
         overhead. It does not carry your own dispatch time.
       </Text>
+
+      {/* Three of the four criteria need finished jobs before they mean
+          anything. Saying so beats four amber "No data" chips. */}
+      {m.completed_jobs === 0 ? (
+        <View
+          style={{
+            backgroundColor: c.primaryTint,
+            borderRadius: Radius.card,
+            borderCurve: 'continuous',
+            padding: 13,
+            gap: 4,
+          }}>
+          <Text style={{ fontSize: 13.5, fontWeight: '800', color: c.primary }}>
+            Nothing to measure yet
+          </Text>
+          <Text style={{ fontSize: 12.5, color: c.primary, lineHeight: 18 }}>
+            {m.total_jobs === 0
+              ? 'No jobs booked yet. These fill in on their own as work comes through.'
+              : `${m.total_jobs} job${m.total_jobs === 1 ? '' : 's'} booked, but none completed — margin and repeat rate need finished, paid work before they mean anything. The page itself is working.`}
+          </Text>
+        </View>
+      ) : null}
 
       {m.jobs_missing_cost > 0 ? (
         <View

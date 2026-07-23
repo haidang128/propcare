@@ -29,6 +29,12 @@ export type JobType = {
   price_inc_vat: number;
   /** Emergency lines only — enforced by the jobs_ooh_eligibility trigger too. */
   out_of_hours_eligible: boolean;
+  /** 'hour' lines are bought by the hour; everything else is one flat price */
+  unit: 'job' | 'hour';
+  /** Price of each hour after the first; null = the same as the first hour */
+  additional_unit_price_inc_vat: number | null;
+  /** No price on the card: the office quotes it before the landlord approves */
+  requires_quote: boolean;
 };
 
 export type Job = {
@@ -39,12 +45,18 @@ export type Job = {
   description: string;
   urgency: Urgency;
   status: JobStatus;
-  agreed_price_inc_vat: number;
+  /** null until the office quotes a "something else" request */
+  agreed_price_inc_vat: number | null;
   surcharge_multiplier: number;
   assigned_technician_id: string | null;
   technician_accepted_at: string | null;
   scheduled_start: string | null;
   scheduled_end: string | null;
+  /** What the landlord asked for at booking; the tenant confirms the real one */
+  preferred_slot_start: string | null;
+  preferred_slot_end: string | null;
+  /** Hours bought up front on an hourly line; 1 for every flat-price job */
+  quantity: number;
   created_at: string;
   property?: Property;
   job_type?: JobType;
@@ -52,8 +64,19 @@ export type Job = {
 
 export type NewPropertyInput = Omit<Property, 'id'>;
 
+export type CertificationType =
+  | 'niceic'
+  | 'napit'
+  | 'wras'
+  | 'gas_safe'
+  | 'public_liability'
+  | 'other';
+
 export type Certification = {
-  type: 'niceic' | 'napit' | 'wras' | 'gas_safe' | 'public_liability' | 'other';
+  /** absent on the technician's own read-only view of their documents */
+  id?: string;
+  type: CertificationType;
+  reference?: string | null;
   expires_on: string;
   verified: boolean;
 };
@@ -81,16 +104,36 @@ export type NewJobDraft = {
   photoUris: string[];
   urgency: Urgency;
   slot: { start: string; end: string } | null;
+  /** Hours, for an hourly line. Ignored (forced to 1) on a flat-price line. */
+  quantity?: number;
 };
 
 /** True when the surcharge tier is offered at all for this job type. */
 export function canBookOutOfHours(jobType: JobType): boolean {
-  return jobType.out_of_hours_eligible && pricing().out_of_hours_multiplier > 1;
+  return (
+    jobType.out_of_hours_eligible &&
+    !jobType.requires_quote &&
+    pricing().out_of_hours_multiplier > 1
+  );
 }
 
-export function jobPrice(jobType: JobType, urgency: Urgency): number {
+/** Hours can only be bought on an hourly line. */
+export function maxUnits(jobType: JobType): number {
+  return jobType.unit === 'hour' && !jobType.requires_quote ? 8 : 1;
+}
+
+/**
+ * Mirrors guard_job_insert() in supabase/migrations/0018. The database is the
+ * authority — this is what we show before it answers.
+ * Returns null for a line the office has to quote.
+ */
+export function jobPrice(jobType: JobType, urgency: Urgency, quantity = 1): number | null {
+  if (jobType.requires_quote) return null;
   const { out_of_hours_multiplier, minimum_job_inc_vat } = pricing();
-  const base = Math.max(jobType.price_inc_vat, minimum_job_inc_vat);
+  const first = Math.max(jobType.price_inc_vat, minimum_job_inc_vat);
+  const units = Math.min(Math.max(quantity, 1), maxUnits(jobType));
+  const extra = jobType.additional_unit_price_inc_vat ?? first;
+  const base = first + (units - 1) * extra;
   return urgency === 'out_of_hours' && canBookOutOfHours(jobType)
     ? Math.round(base * out_of_hours_multiplier * 100) / 100
     : base;
@@ -120,15 +163,16 @@ const demo = {
     },
   ] as Property[],
   jobTypes: [
-    { id: 'jt1', category: 'plumbing', name: 'Dripping / leaking tap repair', price_ex_vat: 95, price_inc_vat: 95, out_of_hours_eligible: false },
-    { id: 'jt2', category: 'plumbing', name: 'Sink / bath / shower unblock', price_ex_vat: 105, price_inc_vat: 105, out_of_hours_eligible: false },
+    { id: 'jt1', category: 'plumbing', name: 'Dripping / leaking tap repair', price_ex_vat: 95, price_inc_vat: 95, out_of_hours_eligible: false, unit: 'job', additional_unit_price_inc_vat: null, requires_quote: false },
+    { id: 'jt2', category: 'plumbing', name: 'Sink / bath / shower unblock', price_ex_vat: 105, price_inc_vat: 105, out_of_hours_eligible: false, unit: 'job', additional_unit_price_inc_vat: null, requires_quote: false },
     // The one emergency line — the only job bookable out of hours.
-    { id: 'jt3', category: 'plumbing', name: 'Isolate + make safe (leak emergency)', price_ex_vat: 110, price_inc_vat: 110, out_of_hours_eligible: true },
+    { id: 'jt3', category: 'plumbing', name: 'Isolate + make safe (leak emergency)', price_ex_vat: 110, price_inc_vat: 110, out_of_hours_eligible: true, unit: 'job', additional_unit_price_inc_vat: null, requires_quote: false },
     // No boiler/hot-water line: gas is deferred until Gas Safe vetting (PRD decision #6).
-    { id: 'jt4', category: 'electrical', name: 'Socket replacement', price_ex_vat: 85, price_inc_vat: 85, out_of_hours_eligible: false },
-    { id: 'jt5', category: 'electrical', name: 'Light fitting replacement', price_ex_vat: 95, price_inc_vat: 95, out_of_hours_eligible: false },
-    { id: 'jt6', category: 'handyman', name: 'Internal door adjustment', price_ex_vat: 85, price_inc_vat: 85, out_of_hours_eligible: false },
-    { id: 'jt7', category: 'handyman', name: 'Lock replacement', price_ex_vat: 95, price_inc_vat: 95, out_of_hours_eligible: false },
+    { id: 'jt4', category: 'electrical', name: 'Socket replacement', price_ex_vat: 85, price_inc_vat: 85, out_of_hours_eligible: false, unit: 'job', additional_unit_price_inc_vat: null, requires_quote: false },
+    { id: 'jt5', category: 'electrical', name: 'Fault-find first hour', price_ex_vat: 95, price_inc_vat: 95, out_of_hours_eligible: false, unit: 'hour', additional_unit_price_inc_vat: null, requires_quote: false },
+    { id: 'jt6', category: 'handyman', name: 'General handyman hour', price_ex_vat: 95, price_inc_vat: 95, out_of_hours_eligible: false, unit: 'hour', additional_unit_price_inc_vat: null, requires_quote: false },
+    { id: 'jt7', category: 'handyman', name: 'Lock replacement', price_ex_vat: 95, price_inc_vat: 95, out_of_hours_eligible: false, unit: 'job', additional_unit_price_inc_vat: null, requires_quote: false },
+    { id: 'jt8', category: 'handyman', name: "Something else — we'll quote it", price_ex_vat: 0, price_inc_vat: 0, out_of_hours_eligible: false, unit: 'job', additional_unit_price_inc_vat: null, requires_quote: true },
   ] as JobType[],
   jobs: [] as Job[],
   counter: 2041,
@@ -189,11 +233,20 @@ export async function listJobTypes(): Promise<JobType[]> {
   if (!isSupabaseConfigured) return [...demo.jobTypes];
   const { data, error } = await supabase!
     .from('job_types')
-    .select('id, category, name, price_ex_vat, price_inc_vat, out_of_hours_eligible')
+    .select(
+      'id, category, name, price_ex_vat, price_inc_vat, out_of_hours_eligible, unit, additional_unit_price_inc_vat, requires_quote',
+    )
     .eq('active', true)
+    // "Something else" is priced 0, so price order would float it to the top of
+    // the list it is meant to be the last resort for
+    .order('requires_quote')
     .order('price_inc_vat');
   if (error) throw new Error(error.message);
-  return data as JobType[];
+  return (data as any[]).map((t) => ({
+    ...t,
+    additional_unit_price_inc_vat:
+      t.additional_unit_price_inc_vat == null ? null : Number(t.additional_unit_price_inc_vat),
+  })) as JobType[];
 }
 
 const ACTIVE_STATUSES: JobStatus[] = [
@@ -249,17 +302,80 @@ export async function listTechnicians(): Promise<Technician[]> {
   const { data, error } = await supabase!
     .from('profiles')
     .select('id, full_name, phone, certifications:technician_certifications(type, expires_on, verified)')
-    .eq('role', 'technician');
+    .eq('role', 'technician')
+    // someone off the roster cannot be assigned; the DB refuses it too
+    .is('deactivated_at', null);
   if (error) throw new Error(error.message);
   return data as Technician[];
 }
 
-/** Three offered access windows anchored on the landlord's preferred slot. */
+/**
+ * Everything the office has under way. The dispatch board only ever listed
+ * unassigned requests, so the moment a job was assigned it fell off every admin
+ * screen — nobody could see who was on what, or that a job had started.
+ */
+const IN_FLIGHT_STATUSES: JobStatus[] = [
+  'scheduled', 'in_progress', 'variation_pending', 'awaiting_parts', 'completed', 'disputed',
+];
+
+export type DispatchJob = Job & { technician?: { full_name: string } | null };
+
+export async function listJobsInFlight(): Promise<DispatchJob[]> {
+  if (!isSupabaseConfigured) {
+    return demo.jobs.filter((j) => IN_FLIGHT_STATUSES.includes(j.status));
+  }
+  const { data, error } = await supabase!
+    .from('jobs')
+    .select(
+      '*, property:properties(*), job_type:job_types(*), technician:profiles!jobs_assigned_technician_id_fkey(full_name)',
+    )
+    .in('status', IN_FLIGHT_STATUSES)
+    .order('scheduled_start', { nullsFirst: false });
+  if (error) throw new Error(error.message);
+  return data as DispatchJob[];
+}
+
+/** Office puts a price on a "something else" request; the landlord then approves it. */
+export async function quoteJob(jobId: string, price: number): Promise<void> {
+  if (!isSupabaseConfigured) {
+    const j = demo.jobs.find((x) => x.id === jobId);
+    if (j) {
+      j.agreed_price_inc_vat = price;
+      j.status = 'priced';
+    }
+    return;
+  }
+  const { error } = await supabase!.rpc('price_quote_job', { p_job_id: jobId, p_price: price });
+  if (error) throw new Error(error.message);
+}
+
+/**
+ * The three windows the tenant gets to choose between. The first is the slot
+ * the landlord asked for in the wizard; the other two are the same window on
+ * the next two days, so the tenant always has an out.
+ *
+ * This used to read job.scheduled_start, which guard_job_insert deliberately
+ * nulls on a landlord insert — so the landlord's choice was thrown away and
+ * every tenant was offered "tomorrow, at whatever o'clock it is now" instead.
+ * The preference now has its own column and survives.
+ */
 function offeredSlotsFor(job: Job): { start: string; end: string }[] {
-  const base = job.scheduled_start ? new Date(job.scheduled_start) : new Date(Date.now() + 86400000);
-  const durationMs = job.scheduled_end
-    ? new Date(job.scheduled_end).getTime() - new Date(job.scheduled_start!).getTime()
-    : 2 * 3600000;
+  const preferred = job.preferred_slot_start ?? job.scheduled_start;
+  const preferredEnd = job.preferred_slot_end ?? job.scheduled_end;
+  const durationMs =
+    preferred && preferredEnd
+      ? new Date(preferredEnd).getTime() - new Date(preferred).getTime()
+      : 2 * 3600000;
+
+  // a preference that has already passed helps nobody: fall back to the same
+  // time of day tomorrow, on the hour
+  let base = preferred ? new Date(preferred) : new Date(Date.now() + 86400000);
+  if (base.getTime() < Date.now()) {
+    const next = new Date(Date.now() + 86400000);
+    next.setHours(preferred ? new Date(preferred).getHours() : 10, 0, 0, 0);
+    base = next;
+  }
+
   return [0, 1, 2].map((days) => {
     const start = new Date(base.getTime() + days * 86400000);
     return { start: start.toISOString(), end: new Date(start.getTime() + durationMs).toISOString() };
@@ -458,7 +574,7 @@ export async function flagVariation(
       status: 'admin_review',
       suggested_price_inc_vat: input.suggestedPrice ?? null,
       admin_price_inc_vat: null,
-      old_job_price_inc_vat: job.agreed_price_inc_vat,
+      old_job_price_inc_vat: job.agreed_price_inc_vat ?? 0,
       new_job_price_inc_vat: null,
       created_at: new Date().toISOString(),
       job,
@@ -542,6 +658,23 @@ export async function listPendingVariations(): Promise<Variation[]> {
   return (data as Variation[]).filter(
     (v) => v.status !== 'declined' || v.job?.status === 'variation_pending',
   );
+}
+
+/**
+ * Everything the office should be able to see, not only what it has to act on.
+ * A variation sent to the landlord left the queue and appeared nowhere at all,
+ * so a technician could be stood in a flat waiting on a decision no one could
+ * see was outstanding.
+ */
+export async function listAllVariations(): Promise<Variation[]> {
+  if (!isSupabaseConfigured) return [...demoVariations];
+  const { data, error } = await supabase!
+    .from('variations')
+    .select('*, job:jobs(*, property:properties(*), job_type:job_types(*))')
+    .order('created_at', { ascending: false })
+    .limit(50);
+  if (error) throw new Error(error.message);
+  return data as Variation[];
 }
 
 /** True when this variation is a landlord decline still waiting on the office. */
@@ -683,7 +816,7 @@ export async function getInvoice(jobId: string): Promise<Invoice | null> {
       demoInvoices[jobId] = {
         id: `inv-${jobId}`,
         number: job.reference,
-        total_inc_vat: job.agreed_price_inc_vat,
+        total_inc_vat: job.agreed_price_inc_vat ?? 0,
         status: job.status === 'paid' ? 'paid' : job.status === 'disputed' ? 'disputed' : 'sent',
         stripe_payment_link: null,
         capture_deadline: new Date(Date.now() + 72 * 3600000).toISOString(),
@@ -815,27 +948,118 @@ export async function listMyCertifications(): Promise<Certification[]> {
 }
 
 /** Registry view: technicians + certs + on-call state + cost (admin). */
-export type RegistryTechnician = Technician & { on_call: boolean; pay_rate_per_hour: number | null };
+export type RegistryTechnician = Technician & {
+  email: string | null;
+  on_call: boolean;
+  pay_rate_per_hour: number | null;
+  /** set when they leave the roster; history stays, new work does not */
+  deactivated_at: string | null;
+};
 
 export async function listRegistryTechnicians(): Promise<RegistryTechnician[]> {
   if (!isSupabaseConfigured) {
-    return demo.technicians.map((t, i) => ({ ...t, on_call: i === 0, pay_rate_per_hour: null }));
+    return demo.technicians.map((t, i) => ({
+      ...t,
+      email: `${t.full_name.split(' ')[0].toLowerCase()}@example.com`,
+      on_call: i === 0,
+      pay_rate_per_hour: null,
+      deactivated_at: null,
+    }));
   }
   const { data, error } = await supabase!
     .from('profiles')
     .select(
-      'id, full_name, phone, pay_rate_per_hour, certifications:technician_certifications(type, expires_on, verified), oncall:on_call_optins(active)',
+      'id, full_name, phone, email, pay_rate_per_hour, deactivated_at, certifications:technician_certifications(id, type, reference, expires_on, verified), oncall:on_call_optins(active)',
     )
-    .eq('role', 'technician');
+    .eq('role', 'technician')
+    .order('deactivated_at', { nullsFirst: true })
+    .order('full_name');
   if (error) throw new Error(error.message);
   return (data as any[]).map((t) => ({
     id: t.id,
     full_name: t.full_name,
     phone: t.phone,
+    email: t.email ?? null,
     pay_rate_per_hour: t.pay_rate_per_hour == null ? null : Number(t.pay_rate_per_hour),
+    deactivated_at: t.deactivated_at ?? null,
     certifications: t.certifications ?? [],
     on_call: Array.isArray(t.oncall) ? (t.oncall[0]?.active ?? false) : (t.oncall?.active ?? false),
   }));
+}
+
+/** Name and phone are the office's record of who to send where. */
+export async function updateTechnician(
+  technicianId: string,
+  patch: { full_name?: string; phone?: string | null },
+): Promise<void> {
+  if (!isSupabaseConfigured) return;
+  const { error } = await supabase!.from('profiles').update(patch).eq('id', technicianId);
+  if (error) throw new Error(error.message);
+}
+
+/**
+ * Leaving the roster is deactivation, never deletion: jobs.assigned_technician_id
+ * has no cascade and the financial record has to survive six years.
+ */
+export async function setTechnicianOnRoster(technicianId: string, onRoster: boolean): Promise<void> {
+  if (!isSupabaseConfigured) return;
+  const { error } = await supabase!
+    .from('profiles')
+    .update({ deactivated_at: onRoster ? null : new Date().toISOString() })
+    .eq('id', technicianId);
+  if (error) throw new Error(error.message);
+}
+
+export async function addCertification(
+  technicianId: string,
+  cert: { type: CertificationType; expires_on: string; reference?: string; verified: boolean },
+): Promise<void> {
+  if (!isSupabaseConfigured) return;
+  const { error } = await supabase!.from('technician_certifications').insert({
+    technician_id: technicianId,
+    type: cert.type,
+    expires_on: cert.expires_on,
+    reference: cert.reference || null,
+    verified: cert.verified,
+  });
+  if (error) throw new Error(error.message);
+}
+
+export async function removeCertification(certificationId: string): Promise<void> {
+  if (!isSupabaseConfigured) return;
+  const { error } = await supabase!
+    .from('technician_certifications')
+    .delete()
+    .eq('id', certificationId);
+  if (error) throw new Error(error.message);
+}
+
+/**
+ * Add someone to the roster. Creating a login needs the service role, so this
+ * goes through an Edge Function that checks the caller is an admin. It returns
+ * a one-time sign-in link because Supabase's built-in mail is rate limited to a
+ * handful an hour — the office sends it the same way it sends the tenant link.
+ */
+export async function inviteTechnician(input: {
+  email: string;
+  full_name: string;
+  phone?: string;
+}): Promise<{ signInLink: string | null; alreadyExisted: boolean }> {
+  if (!isSupabaseConfigured) return { signInLink: null, alreadyExisted: false };
+  const sb = supabase!;
+  const { data: sessionData } = await sb.auth.getSession();
+  const res = await fetch(`${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/manage-roster`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${sessionData.session?.access_token}`,
+      apikey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!,
+    },
+    body: JSON.stringify({ action: 'add_technician', ...input }),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error ?? 'Could not add that technician.');
+  return { signInLink: body.sign_in_link ?? null, alreadyExisted: !!body.already_existed };
 }
 
 /** Technician cost per hour — the missing input for per-job margin (PRD §2 gate). */
@@ -893,7 +1117,11 @@ export async function getJobPhotoUrls(jobId: string, kind?: 'request' | 'before'
  * Photos upload to the private job-photos bucket.
  */
 export async function createApprovedJob(draft: NewJobDraft): Promise<Job> {
-  const price = jobPrice(draft.jobType, draft.urgency);
+  const quantity = Math.min(Math.max(draft.quantity ?? 1, 1), maxUnits(draft.jobType));
+  const price = jobPrice(draft.jobType, draft.urgency, quantity);
+  // a "something else" line has no card price: it stops at 'requested' until
+  // the office quotes it, and only then does the landlord approve
+  const needsQuote = draft.jobType.requires_quote;
 
   if (!isSupabaseConfigured) {
     const job: Job = {
@@ -903,13 +1131,16 @@ export async function createApprovedJob(draft: NewJobDraft): Promise<Job> {
       category: draft.jobType.category,
       description: draft.description,
       urgency: draft.urgency,
-      status: 'approved',
-      agreed_price_inc_vat: price,
+      status: needsQuote ? 'requested' : 'approved',
+      agreed_price_inc_vat: price as number,
       surcharge_multiplier: draft.urgency === 'out_of_hours' && canBookOutOfHours(draft.jobType) ? pricing().out_of_hours_multiplier : 1,
       assigned_technician_id: null,
       technician_accepted_at: null,
-      scheduled_start: draft.slot?.start ?? null,
-      scheduled_end: draft.slot?.end ?? null,
+      scheduled_start: null,
+      scheduled_end: null,
+      preferred_slot_start: draft.slot?.start ?? null,
+      preferred_slot_end: draft.slot?.end ?? null,
+      quantity,
       created_at: new Date().toISOString(),
       property: draft.property,
       job_type: draft.jobType,
@@ -929,15 +1160,22 @@ export async function createApprovedJob(draft: NewJobDraft): Promise<Job> {
       category: draft.jobType.category,
       description: draft.description,
       urgency: draft.urgency,
+      quantity,
       agreed_price_inc_vat: price,
       surcharge_multiplier: draft.urgency === 'out_of_hours' && canBookOutOfHours(draft.jobType) ? pricing().out_of_hours_multiplier : 1,
-      scheduled_start: draft.slot?.start ?? null,
-      scheduled_end: draft.slot?.end ?? null,
+      // scheduled_* is the office's to set; this is only what the landlord asked for
+      preferred_slot_start: draft.slot?.start ?? null,
+      preferred_slot_end: draft.slot?.end ?? null,
     })
     .select()
     .single();
   if (error) throw new Error(error.message);
   const job = inserted as Job;
+
+  if (needsQuote) {
+    await uploadDraftPhotos(job.id, draft.photoUris, userData.user?.id);
+    return { ...job, property: draft.property, job_type: draft.jobType };
+  }
 
   // requested → priced (instant, from rate card) → approved (the landlord's tap)
   const { error: e1 } = await sb.rpc('transition_job', { p_job_id: job.id, p_to: 'priced' });
@@ -945,26 +1183,32 @@ export async function createApprovedJob(draft: NewJobDraft): Promise<Job> {
   const { error: e2 } = await sb.rpc('transition_job', { p_job_id: job.id, p_to: 'approved' });
   if (e2) throw new Error(e2.message);
 
-  for (const uri of draft.photoUris) {
+  await uploadDraftPhotos(job.id, draft.photoUris, userData.user?.id);
+
+  return { ...job, status: 'approved', property: draft.property, job_type: draft.jobType };
+}
+
+/** Best-effort: the job is already booked, a failed photo must not undo that. */
+async function uploadDraftPhotos(jobId: string, uris: string[], userId?: string): Promise<void> {
+  const sb = supabase!;
+  for (const uri of uris) {
     try {
       const res = await fetch(uri);
       const body = await res.arrayBuffer();
-      const path = `${job.id}/request-${Date.now()}.jpg`;
+      const path = `${jobId}/request-${Date.now()}.jpg`;
       const { error: upErr } = await sb.storage
         .from('job-photos')
         .upload(path, body, { contentType: 'image/jpeg' });
       if (!upErr) {
         await sb.from('job_photos').insert({
-          job_id: job.id,
+          job_id: jobId,
           kind: 'request',
           storage_path: path,
-          uploaded_by: userData.user?.id,
+          uploaded_by: userId,
         });
       }
     } catch {
-      // photo upload is best-effort at this stage; the job itself is already booked
+      // best-effort
     }
   }
-
-  return { ...job, status: 'approved', property: draft.property, job_type: draft.jobType };
 }

@@ -15,6 +15,8 @@ export default function Booked() {
   const { colors: c, status } = usePalette();
   const draft = useDraft();
   const job = draft.bookedJob;
+  // a "something else" request stops at 'requested' until the office prices it
+  const awaitingQuote = job?.status === 'requested';
 
   const now = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 
@@ -35,13 +37,19 @@ export default function Booked() {
           }}>
           <Check size={32} color={status.green.dot} strokeWidth={3} />
         </View>
-        <Text style={{ fontSize: 24, fontWeight: '700', color: c.text }}>Booked</Text>
+        <Text style={{ fontSize: 24, fontWeight: '700', color: c.text }}>
+          {awaitingQuote ? 'Sent for a price' : 'Booked'}
+        </Text>
         <Text style={{ fontSize: 15, color: c.textSecondary, textAlign: 'center', lineHeight: 22 }}>
-          {draft.slot ? `${draft.slot.label}, ${draft.slot.timeLabel}` : ''} ·{' '}
-          {job ? `${formatGBP(job.agreed_price_inc_vat)} fixed` : ''}
-          {draft.property?.tenant_name
-            ? `\nWe'll text ${draft.property.tenant_name.split(' ')[0]} to confirm access.`
-            : ''}
+          {awaitingQuote
+            ? "We'll come back with a fixed price to approve — usually the same working day. Nothing is booked or charged until you say yes."
+            : `${draft.slot ? `${draft.slot.label}, ${draft.slot.timeLabel}` : ''} · ${
+                job?.agreed_price_inc_vat != null ? `${formatGBP(job.agreed_price_inc_vat)} fixed` : ''
+              }${
+                draft.property?.tenant_name
+                  ? `\nWe'll text ${draft.property.tenant_name.split(' ')[0]} to confirm access.`
+                  : ''
+              }`}
         </Text>
       </View>
 
@@ -55,25 +63,45 @@ export default function Booked() {
           padding: 16,
         }}>
         <StatusTimeline
-          steps={[
-            { title: 'Request received', detail: `Today, ${now}`, state: 'done' },
-            {
-              title: `Price approved — ${job ? formatGBP(job.agreed_price_inc_vat) : ''}`,
-              detail: `Today, ${now} · by you`,
-              state: 'done',
-            },
-            {
-              title: 'Scheduling your visit',
-              detail: 'Waiting for tenant to confirm access',
-              state: 'current',
-              currentHue: 'blue',
-            },
-            {
-              title: 'Job day — live updates here',
-              detail: "You won't need to call anyone",
-              state: 'upcoming',
-            },
-          ]}
+          steps={
+            awaitingQuote
+              ? [
+                  { title: 'Request received', detail: `Today, ${now}`, state: 'done' },
+                  {
+                    title: 'Being priced',
+                    detail: 'Usually the same working day',
+                    state: 'current',
+                    currentHue: 'blue',
+                  },
+                  {
+                    title: 'Your approval',
+                    detail: 'One fixed price, yes or no',
+                    state: 'upcoming',
+                  },
+                  { title: 'Booked, then done', state: 'upcoming' },
+                ]
+              : [
+                  { title: 'Request received', detail: `Today, ${now}`, state: 'done' },
+                  {
+                    title: `Price approved — ${
+                      job?.agreed_price_inc_vat != null ? formatGBP(job.agreed_price_inc_vat) : ''
+                    }`,
+                    detail: `Today, ${now} · by you`,
+                    state: 'done',
+                  },
+                  {
+                    title: 'Scheduling your visit',
+                    detail: 'Waiting for tenant to confirm access',
+                    state: 'current',
+                    currentHue: 'blue',
+                  },
+                  {
+                    title: 'Job day — live updates here',
+                    detail: "You won't need to call anyone",
+                    state: 'upcoming',
+                  },
+                ]
+          }
         />
       </View>
 

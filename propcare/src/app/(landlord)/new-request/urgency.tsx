@@ -31,6 +31,10 @@ export default function PickUrgency() {
   // land here with an empty draft. Start the wizard over rather than crash.
   if (!jobType) return <Redirect href="/(landlord)/new-request" />;
 
+  // null on a "something else" line: the office quotes it after it reads the
+  // description, so there is no number to show yet
+  const standardPrice = jobPrice(jobType, 'standard', draft.quantity);
+
   return (
     <>
       <Stack.Screen options={{ headerRight: () => <StepBadge label="Step 4 of 5" /> }} />
@@ -39,7 +43,9 @@ export default function PickUrgency() {
         style={{ flex: 1, backgroundColor: c.background }}
         contentContainerStyle={{ padding: 20, gap: 16, flexGrow: 1 }}>
         <Text style={{ fontSize: 15, color: c.textSecondary }}>
-          {jobType.name} · {draft.property?.address_line1}
+          {jobType.name}
+          {jobType.unit === 'hour' && draft.quantity > 1 ? ` × ${draft.quantity} hours` : ''} ·{' '}
+          {draft.property?.address_line1}
         </Text>
 
         <Pressable
@@ -58,12 +64,15 @@ export default function PickUrgency() {
             <Text
               selectable
               style={{ fontSize: 20, fontWeight: '800', color: c.text, fontVariant: ['tabular-nums'] }}>
-              {formatGBP(jobPrice(jobType, 'standard'))}
+              {standardPrice == null ? 'Quoted' : formatGBP(standardPrice)}
             </Text>
           </View>
           <Text style={{ fontSize: 14, color: c.textSecondary, lineHeight: 21 }}>
-            Next available weekday slot — usually within 2 working days. Fixed price
-            {incVatSuffix() ? `,${incVatSuffix()}` : ''}.
+            {standardPrice == null
+              ? 'Next available weekday slot. We price it first and you approve the price before anything is booked.'
+              : `Next available weekday slot — usually within 2 working days. Fixed price${
+                  incVatSuffix() ? `,${incVatSuffix()}` : ''
+                }.`}
           </Text>
         </Pressable>
 
@@ -97,7 +106,7 @@ export default function PickUrgency() {
                 color: c.textSecondary,
                 fontVariant: ['tabular-nums'],
               }}>
-              {formatGBP(jobPrice(jobType, 'out_of_hours'))}
+              {formatGBP(jobPrice(jobType, 'out_of_hours', draft.quantity) ?? 0)}
             </Text>
           </View>
           <Text style={{ fontSize: 14, color: c.textSecondary, lineHeight: 21 }}>
@@ -132,7 +141,7 @@ export default function PickUrgency() {
 
         <View style={{ marginTop: 'auto' }}>
           <PrimaryButton
-            label="See your fixed price"
+            label={standardPrice == null ? 'Continue' : 'See your fixed price'}
             onPress={() => router.push('/(landlord)/new-request/price')}
           />
         </View>

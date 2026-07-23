@@ -10,17 +10,37 @@ const BLUE = '#0F4C81';
 const LIGHT_BLUE = '#9CC4E8';
 
 /**
+ * Supabase refuses email-template edits on the free tier while it uses the
+ * built-in mail provider, so today's email carries only a link. The code path
+ * is built and tested; flip this on with the custom SMTP that launch needs
+ * anyway (see the auth SMTP item in the launch checklist).
+ */
+const EMAIL_CARRIES_CODE = process.env.EXPO_PUBLIC_EMAIL_CODES === '1';
+
+/**
  * Onboarding / sign-up — design 03 screen A. Deep blue, the three promises,
  * email OTP entry. While Supabase is unconfigured, preview buttons let us
  * enter each role surface (week 1 exit demo).
  */
 export default function SignIn() {
-  const { signInWithOtp, signInWithGoogle, signInWithApple, previewAs, previewMode, role } =
-    useAuth();
+  const {
+    signInWithOtp,
+    verifyEmailCode,
+    signInWithGoogle,
+    signInWithApple,
+    previewAs,
+    previewMode,
+    role,
+    notice,
+    clearNotice,
+  } = useAuth();
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [code, setCode] = useState('');
+  const [verifying, setVerifying] = useState(false);
+  const [resent, setResent] = useState(false);
   const [busyProvider, setBusyProvider] = useState<'google' | 'apple' | null>(null);
 
   async function withProvider(provider: 'google' | 'apple') {
@@ -38,11 +58,39 @@ export default function SignIn() {
 
   async function onContinue() {
     setError(null);
+    clearNotice();
     setSending(true);
     const result = await signInWithOtp(email.trim());
     setSending(false);
     if (result.error) setError(result.error);
     else setSent(true);
+  }
+
+  async function onResend() {
+    setError(null);
+    setResent(false);
+    setSending(true);
+    const result = await signInWithOtp(email.trim());
+    setSending(false);
+    if (result.error) setError(result.error);
+    else setResent(true);
+  }
+
+  async function onVerify() {
+    setError(null);
+    setVerifying(true);
+    const result = await verifyEmailCode(email.trim(), code);
+    setVerifying(false);
+    if (result.error) setError(result.error);
+    // success routes through the role effect above
+  }
+
+  /** Back to the start: the email box, Google, everything. */
+  function startOver() {
+    setSent(false);
+    setCode('');
+    setResent(false);
+    setError(null);
   }
 
   function enterAs(role: Role) {
@@ -110,6 +158,19 @@ export default function SignIn() {
       </View>
 
       <View style={{ marginTop: 'auto', gap: 10, paddingBottom: 8 }}>
+        {notice && !sent ? (
+          <View
+            style={{
+              backgroundColor: 'rgba(255,217,214,0.16)',
+              borderRadius: 12,
+              borderCurve: 'continuous',
+              padding: 14,
+            }}>
+            <Text style={{ color: '#FFD9D6', fontSize: 13.5, fontWeight: '600', lineHeight: 20 }}>
+              {notice}
+            </Text>
+          </View>
+        ) : null}
         {sent ? (
           <View
             style={{
@@ -117,29 +178,100 @@ export default function SignIn() {
               borderRadius: 12,
               borderCurve: 'continuous',
               padding: 16,
-              alignItems: 'center',
-              gap: 8,
+              gap: 10,
             }}>
-            <MailCheck size={26} color={LIGHT_BLUE} />
-            <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '700' }}>
-              Check your email
-            </Text>
-            <Text
-              style={{
-                color: '#FFFFFF',
-                opacity: 0.85,
-                fontSize: 13.5,
-                textAlign: 'center',
-                lineHeight: 20,
-              }}>
-              We&apos;ve sent a sign-in link to {email.trim()}. Open it on this device — you&apos;ll
-              land straight back here, signed in.
-            </Text>
-            <Pressable onPress={() => setSent(false)} hitSlop={8}>
-              <Text style={{ color: LIGHT_BLUE, fontSize: 13, fontWeight: '700' }}>
-                Use a different email
+            <View style={{ alignItems: 'center', gap: 8 }}>
+              <MailCheck size={26} color={LIGHT_BLUE} />
+              <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '700' }}>
+                Check your email
               </Text>
-            </Pressable>
+              <Text
+                style={{
+                  color: '#FFFFFF',
+                  opacity: 0.85,
+                  fontSize: 13.5,
+                  textAlign: 'center',
+                  lineHeight: 20,
+                }}>
+                {EMAIL_CARRIES_CODE
+                  ? `We've sent ${email.trim()} a sign-in link and a code. Tap the link, or type the code in here — either works.`
+                  : `We've sent a sign-in link to ${email.trim()}. Open it on this device and you'll land back here, signed in.`}
+              </Text>
+            </View>
+
+            {/* The code path exists because the link signs you in only in
+                whichever browser opens it, which is often not this one. */}
+            {EMAIL_CARRIES_CODE ? (
+              <>
+                <TextInput
+                  value={code}
+                  onChangeText={setCode}
+                  placeholder="Sign-in code"
+                  placeholderTextColor="#8A96A1"
+                  autoCapitalize="none"
+                  autoComplete="one-time-code"
+                  keyboardType="number-pad"
+                  returnKeyType="go"
+                  onSubmitEditing={onVerify}
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: 12,
+                    borderCurve: 'continuous',
+                    paddingVertical: 14,
+                    paddingHorizontal: 16,
+                    fontSize: 18,
+                    fontWeight: '700',
+                    letterSpacing: 4,
+                    textAlign: 'center',
+                    color: '#17222E',
+                  }}
+                />
+                <Pressable
+                  onPress={onVerify}
+                  disabled={verifying || code.trim().length < 6}
+                  style={({ pressed }) => ({
+                    backgroundColor: pressed ? '#0B1620' : '#17222E',
+                    minHeight: 52,
+                    borderRadius: 12,
+                    borderCurve: 'continuous',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    opacity: code.trim().length < 6 ? 0.6 : 1,
+                  })}>
+                  {verifying ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '700' }}>
+                      Sign in with code
+                    </Text>
+                  )}
+                </Pressable>
+              </>
+            ) : null}
+
+            {error ? (
+              <Text selectable style={{ color: '#FFD9D6', fontSize: 13, fontWeight: '600' }}>
+                {error}
+              </Text>
+            ) : null}
+            {resent ? (
+              <Text style={{ color: LIGHT_BLUE, fontSize: 13, fontWeight: '600', textAlign: 'center' }}>
+                New email sent.
+              </Text>
+            ) : null}
+
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 12 }}>
+              <Pressable onPress={startOver} hitSlop={8}>
+                <Text style={{ color: LIGHT_BLUE, fontSize: 13, fontWeight: '700' }}>
+                  ← Back
+                </Text>
+              </Pressable>
+              <Pressable onPress={onResend} disabled={sending} hitSlop={8}>
+                <Text style={{ color: LIGHT_BLUE, fontSize: 13, fontWeight: '700' }}>
+                  {sending ? 'Sending…' : 'Send it again'}
+                </Text>
+              </Pressable>
+            </View>
           </View>
         ) : (
           <>

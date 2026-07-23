@@ -9,7 +9,7 @@ import { PrimaryButton } from '@/components/primary-button';
 import { StepBadge } from '@/components/step-badge';
 import { Radius } from '@/constants/theme';
 import { usePalette } from '@/hooks/use-palette';
-import { listJobTypes, type Category, type JobType } from '@/lib/data';
+import { jobPrice, listJobTypes, maxUnits, type Category, type JobType } from '@/lib/data';
 import { formatGBP } from '@/lib/job-status';
 import { useDraft } from '@/lib/new-request-draft';
 
@@ -41,6 +41,8 @@ export default function DescribeIssue() {
   // draft, leaving a step with no property and no job types to choose from.
   if (!draft.property || !category) return <Redirect href="/(landlord)/new-request" />;
 
+  const selected = draft.jobType;
+
   return (
     <>
       <Stack.Screen options={{ headerRight: () => <StepBadge label="Step 3 of 5" /> }} />
@@ -62,11 +64,12 @@ export default function DescribeIssue() {
               return (
                 <Pressable
                   key={t.id}
-                  onPress={() => draft.update({ jobType: t })}
+                  onPress={() => draft.update({ jobType: t, quantity: 1 })}
                   style={{
                     backgroundColor: isSelected ? c.primary : c.backgroundElement,
-                    borderWidth: isSelected ? 0 : 1,
-                    borderColor: c.border,
+                    borderWidth: isSelected ? 0 : t.requires_quote ? 1.5 : 1,
+                    borderColor: t.requires_quote ? c.primary : c.border,
+                    borderStyle: t.requires_quote && !isSelected ? 'dashed' : 'solid',
                     paddingVertical: 10,
                     paddingHorizontal: 14,
                     borderRadius: Radius.chip,
@@ -80,13 +83,73 @@ export default function DescribeIssue() {
                       color: isSelected ? c.onPrimary : c.text,
                       fontVariant: ['tabular-nums'],
                     }}>
-                    {t.name} · {formatGBP(t.price_inc_vat).replace('.00', '')}
+                    {t.requires_quote
+                      ? t.name
+                      : `${t.name} · ${formatGBP(t.price_inc_vat).replace('.00', '')}${
+                          t.unit === 'hour' ? '/hr' : ''
+                        }`}
                   </Text>
                 </Pressable>
               );
             })}
           </View>
+          {/* The rate card is 23 lines; the things that break in a flat are not.
+              Without this, anything unlisted has no way into the app at all. */}
+          {selected?.requires_quote ? (
+            <Text style={{ fontSize: 12.5, color: c.textSecondary, lineHeight: 18 }}>
+              Tell us what&apos;s wrong below and add a photo. We&apos;ll come back with a fixed
+              price to approve — nothing is booked and nothing is charged until you do.
+            </Text>
+          ) : null}
         </View>
+
+        {/* Hourly lines are sold by the hour (rate card H1, E5); one hour was
+            the only quantity the app could express. */}
+        {selected && selected.unit === 'hour' && !selected.requires_quote ? (
+          <View style={{ gap: 8 }}>
+            <Text style={{ fontSize: 13, fontWeight: '700', color: c.textSecondary }}>
+              How long do you think it needs?
+            </Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+              {Array.from({ length: maxUnits(selected) }, (_, i) => i + 1).map((hours) => {
+                const on = draft.quantity === hours;
+                return (
+                  <Pressable
+                    key={hours}
+                    onPress={() => draft.update({ quantity: hours })}
+                    style={{
+                      backgroundColor: on ? c.primary : c.backgroundElement,
+                      borderWidth: on ? 0 : 1,
+                      borderColor: c.border,
+                      minWidth: 74,
+                      minHeight: 44,
+                      paddingHorizontal: 12,
+                      borderRadius: Radius.chip,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: on ? c.onPrimary : c.text }}>
+                      {hours} hour{hours > 1 ? 's' : ''}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 11.5,
+                        color: on ? c.onPrimary : c.textTertiary,
+                        fontVariant: ['tabular-nums'],
+                      }}>
+                      {formatGBP(jobPrice(selected, 'standard', hours) ?? 0).replace('.00', '')}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+            <Text style={{ fontSize: 12, color: c.textTertiary, lineHeight: 17 }}>
+              Pick the hours up front and that&apos;s the fixed price. If it turns out to need
+              longer, the engineer asks you first — you&apos;re never billed for time you
+              didn&apos;t agree.
+            </Text>
+          </View>
+        ) : null}
 
         <TextInput
           value={draft.description}
@@ -144,9 +207,15 @@ export default function DescribeIssue() {
         <View style={{ marginTop: 'auto' }}>
           <PrimaryButton
             label="Continue"
-            disabled={!draft.jobType}
+            // nothing can be quoted from a blank description
+            disabled={!selected || (selected.requires_quote && draft.description.trim().length < 10)}
             onPress={() => router.push('/(landlord)/new-request/urgency')}
           />
+          {selected?.requires_quote && draft.description.trim().length < 10 ? (
+            <Text style={{ fontSize: 12, color: c.textTertiary, textAlign: 'center', marginTop: 6 }}>
+              Describe the job above so we can price it.
+            </Text>
+          ) : null}
         </View>
       </ScrollView>
     </>

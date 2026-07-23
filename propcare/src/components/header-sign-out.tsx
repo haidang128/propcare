@@ -15,6 +15,10 @@ export function HeaderSignOut() {
     <HeaderRight>
       <Pressable
         hitSlop={10}
+        // without this it renders as a bare div: nothing announces it as a
+        // control, on the one screen every role needs to be able to leave from
+        accessibilityRole="button"
+        accessibilityLabel="Sign out"
         onPress={() => {
           signOut();
           router.replace('/sign-in');

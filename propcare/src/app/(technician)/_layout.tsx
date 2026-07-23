@@ -10,11 +10,9 @@ export default function TechnicianLayout() {
   if (loading) return null;
   if (!role) return <Redirect href="/sign-in" />;
   return (
-    <Stack>
-      <Stack.Screen
-        name="index"
-        options={{ title: 'Today', headerLargeTitle: true, headerRight: () => <HeaderSignOut /> }}
-      />
+    // headerRight on the layout, so every screen in the group carries it
+    <Stack screenOptions={{ headerRight: () => <HeaderSignOut /> }}>
+      <Stack.Screen name="index" options={{ title: 'Today', headerLargeTitle: true }} />
       <Stack.Screen name="profile" options={{ title: 'Profile' }} />
       <Stack.Screen name="job/[id]" options={{ title: 'Job' }} />
       <Stack.Screen

@@ -8,6 +8,8 @@ type Draft = {
   description: string;
   photoUris: string[];
   urgency: Urgency;
+  /** Hours on an hourly line; always 1 on a flat-price one */
+  quantity: number;
   slot: { start: string; end: string; label: string; timeLabel: string } | null;
   /** set after successful booking so the confirmation screen can render */
   bookedJob: Job | null;
@@ -24,6 +26,7 @@ const empty: Draft = {
   description: '',
   photoUris: [],
   urgency: 'standard',
+  quantity: 1,
   slot: null,
   bookedJob: null,
 };

@@ -18,6 +18,27 @@ function sessionFromUrl(url: string): { access_token: string; refresh_token: str
   return access_token && refresh_token ? { access_token, refresh_token } : null;
 }
 
+/**
+ * A sign-in link that fails comes back as query/hash params, not as an error
+ * from any call we make — so without this the user lands on the sign-in screen
+ * with no session, no message, and no idea the link was simply stale.
+ */
+function noticeFromUrl(url: string): string | null {
+  const [head, hash] = url.split('#');
+  const query = head.includes('?') ? head.slice(head.indexOf('?') + 1) : '';
+  const params = new URLSearchParams(`${query}${query && hash ? '&' : ''}${hash ?? ''}`);
+  const code = params.get('error_code');
+  const description = params.get('error_description');
+  if (!code && !description) return null;
+  if (code === 'otp_expired' || description?.toLowerCase().includes('expired')) {
+    return 'That sign-in link had already expired — they only last an hour, and only work once. Send yourself a fresh one below.';
+  }
+  if (code === 'access_denied') {
+    return 'That sign-in link could not be used. Send yourself a fresh one below.';
+  }
+  return description?.replace(/\+/g, ' ') ?? 'Sign-in did not complete. Please try again.';
+}
+
 export type Role = 'landlord' | 'technician' | 'admin';
 
 type AuthState = {
@@ -27,7 +48,12 @@ type AuthState = {
   loading: boolean;
   /** True when running without a Supabase project (role-picker preview mode) */
   previewMode: boolean;
+  /** Set when a sign-in link came back rejected, so the screen can explain it */
+  notice: string | null;
+  clearNotice: () => void;
   signInWithOtp: (email: string) => Promise<{ error?: string }>;
+  /** The code in the same email — works even when the link opens elsewhere */
+  verifyEmailCode: (email: string, code: string) => Promise<{ error?: string }>;
   signInWithGoogle: () => Promise<{ error?: string }>;
   /** iOS only — native Sign in with Apple */
   signInWithApple: () => Promise<{ error?: string }>;
@@ -42,6 +68,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState<Role | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(isSupabaseConfigured);
+  // A rejected link redirects here with the reason in the URL. Read it once at
+  // mount (lazily, so it is not re-read on every render)…
+  const [landingNotice] = useState<string | null>(() =>
+    process.env.EXPO_OS === 'web' && typeof window !== 'undefined'
+      ? noticeFromUrl(window.location.href)
+      : null,
+  );
+  const [noticeDismissed, setNoticeDismissed] = useState(false);
+
+  // …then strip it from the address bar, so a refresh does not resurrect a
+  // complaint about a link the user has already moved on from.
+  useEffect(() => {
+    if (!landingNotice || typeof window === 'undefined') return;
+    window.history.replaceState({}, '', window.location.pathname);
+  }, [landingNotice]);
 
   useEffect(() => {
     const sb = supabase;
@@ -104,6 +145,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (tokens) supabase.auth.setSession(tokens);
   }, [deepLink]);
 
+  // A native deep link that carried no session carried a reason instead;
+  // derived rather than stored, so it needs no effect.
+  const deepLinkNotice =
+    deepLink && process.env.EXPO_OS !== 'web' && !sessionFromUrl(deepLink)
+      ? noticeFromUrl(deepLink)
+      : null;
+  const notice = noticeDismissed ? null : (landingNotice ?? deepLinkNotice);
+
   const signInWithOtp = useCallback(async (email: string) => {
     if (!supabase) return { error: 'Supabase is not configured yet — use preview mode below.' };
     const emailRedirectTo =
@@ -112,6 +161,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         : Linking.createURL('/');
     const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo } });
     return error ? { error: error.message } : {};
+  }, []);
+
+  /**
+   * The same email carries a code as well as a link. The link only signs you in
+   * on whatever browser opens it — which on a phone is often the mail app's own
+   * one, leaving the app you started in still signed out with no way forward.
+   * The code always lands in the session you are actually looking at.
+   *
+   * A first-time address gets a signup confirmation and a returning one gets a
+   * magic link; the code is the same, only the token type differs, so try each.
+   */
+  const verifyEmailCode = useCallback(async (email: string, code: string) => {
+    if (!supabase) return { error: 'Supabase is not configured yet — use preview mode below.' };
+    const token = code.replace(/\D/g, '');
+    if (!token) return { error: 'Enter the code from the email.' };
+    let lastError = 'That code did not work. Check it, or send yourself a new email.';
+    for (const type of ['email', 'signup', 'magiclink'] as const) {
+      const { error } = await supabase.auth.verifyOtp({ email, token, type });
+      if (!error) {
+        setNoticeDismissed(true);
+        return {};
+      }
+      lastError = error.message;
+    }
+    return { error: lastError };
   }, []);
 
   const signInWithGoogle = useCallback(async () => {
@@ -170,10 +244,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signOut = useCallback(() => {
-    supabase?.auth.signOut();
+    // a global sign-out is a network call; if it fails, drop the stored session
+    // anyway rather than leaving someone signed in on a shared device
+    supabase?.auth.signOut().catch(() => supabase?.auth.signOut({ scope: 'local' }));
     setRole(null);
     setUserId(null);
+    setNoticeDismissed(true);
   }, []);
+
+  const clearNotice = useCallback(() => setNoticeDismissed(true), []);
 
   const value = useMemo(
     () => ({
@@ -181,13 +260,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       userId,
       loading,
       previewMode: !isSupabaseConfigured,
+      notice,
+      clearNotice,
       signInWithOtp,
+      verifyEmailCode,
       signInWithGoogle,
       signInWithApple,
       previewAs,
       signOut,
     }),
-    [role, userId, loading, signInWithOtp, signInWithGoogle, signInWithApple, previewAs, signOut],
+    [
+      role,
+      userId,
+      loading,
+      notice,
+      clearNotice,
+      signInWithOtp,
+      verifyEmailCode,
+      signInWithGoogle,
+      signInWithApple,
+      previewAs,
+      signOut,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

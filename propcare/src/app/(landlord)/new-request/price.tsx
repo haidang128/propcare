@@ -59,6 +59,7 @@ export default function PriceApproval() {
         description: draft.description,
         photoUris: draft.photoUris,
         urgency: draft.urgency,
+        quantity: draft.quantity,
         slot: { start: slot.start, end: slot.end },
       });
       draft.update({ bookedJob: job, slot });
@@ -74,9 +75,10 @@ export default function PriceApproval() {
   // land here with an empty draft. Start the wizard over rather than crash.
   if (!jobType || !draft.property) return <Redirect href="/(landlord)/new-request" />;
 
-  const price = jobPrice(jobType, draft.urgency);
+  const price = jobPrice(jobType, draft.urgency, draft.quantity);
+  const hours = jobType.unit === 'hour' ? draft.quantity : 1;
   const included = [
-    jobType.name,
+    hours > 1 ? `${jobType.name} × ${hours} hours` : jobType.name,
     'All labour + standard parts up to £20',
     'Vetted, insured engineer · 12-month guarantee',
     'Extra work always needs your OK first',
@@ -89,7 +91,28 @@ export default function PriceApproval() {
         contentInsetAdjustmentBehavior="automatic"
         style={{ flex: 1, backgroundColor: c.background }}
         contentContainerStyle={{ padding: 20, gap: 14, flexGrow: 1 }}>
-        <PriceDisplay amount={price} variant="hero" />
+        {price == null ? (
+          // A "something else" request has no card price. Saying so plainly beats
+          // showing £0 or inventing a number nobody has agreed to.
+          <View
+            style={{
+              backgroundColor: c.primaryTint,
+              borderRadius: Radius.card,
+              borderCurve: 'continuous',
+              padding: 18,
+              gap: 6,
+            }}>
+            <Text style={{ fontSize: 19, fontWeight: '800', color: c.primary }}>
+              We&apos;ll price this and come back to you
+            </Text>
+            <Text style={{ fontSize: 14, color: c.primary, lineHeight: 21 }}>
+              Usually the same working day. You&apos;ll get a single fixed price to approve or turn
+              down — nothing is booked and nothing is charged until you approve it.
+            </Text>
+          </View>
+        ) : (
+          <PriceDisplay amount={price} variant="hero" />
+        )}
 
         <View
           style={{
@@ -111,7 +134,7 @@ export default function PriceApproval() {
 
         <View style={{ gap: 8 }}>
           <Text style={{ fontSize: 13, fontWeight: '700', color: c.textSecondary }}>
-            Pick a slot — your tenant confirms access
+            When suits? Your tenant confirms from this and the two days after
           </Text>
           <View style={{ flexDirection: 'row', gap: 8 }}>
             {slots.map((slot, i) => {
@@ -156,7 +179,7 @@ export default function PriceApproval() {
 
         <View style={{ marginTop: 'auto', gap: 8 }}>
           <PrimaryButton
-            label={`Approve ${formatGBP(price)} & book`}
+            label={price == null ? 'Send for a price' : `Approve ${formatGBP(price)} & book`}
             onPress={approveAndBook}
             loading={booking}
           />

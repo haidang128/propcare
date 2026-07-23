@@ -12,6 +12,7 @@ import { usePalette } from '@/hooks/use-palette';
 import {
   addTimeMaterial,
   getJob,
+  getJobPhotoUrls,
   listTimeMaterials,
   transitionJobStatus,
   uploadJobPhoto,
@@ -30,11 +31,23 @@ export default function TechnicianJob() {
   const [job, setJob] = useState<Job | null>(null);
   const [busy, setBusy] = useState(false);
   const [photos, setPhotos] = useState<{ before?: string; after?: string }>({});
+  const [uploading, setUploading] = useState<'before' | 'after' | null>(null);
   const [materials, setMaterials] = useState<TimeMaterial[]>([]);
 
   const load = useCallback(() => {
     getJob(id).then(setJob);
     listTimeMaterials(id).then(setMaterials).catch(() => {});
+    // Photos were tracked in local state only, so leaving the screen or
+    // reloading lost them and "Mark job done" locked forever with no way back.
+    // The uploaded photo is the record; read it back.
+    Promise.all([getJobPhotoUrls(id, 'before'), getJobPhotoUrls(id, 'after')])
+      .then(([before, after]) =>
+        setPhotos((p) => ({
+          before: before.at(-1) ?? p.before,
+          after: after.at(-1) ?? p.after,
+        })),
+      )
+      .catch(() => {});
   }, [id]);
 
   useEffect(load, [load]);
@@ -60,12 +73,20 @@ export default function TechnicianJob() {
     if (result.canceled || !result.assets[0]) return;
     const uri = result.assets[0].uri;
     setPhotos((p) => ({ ...p, [kind]: uri }));
-    if (job) {
-      try {
-        await uploadJobPhoto(job.id, uri, kind);
-      } catch {
-        // photo is kept locally; upload retries can come later
-      }
+    if (!job) return;
+    setUploading(kind);
+    try {
+      await uploadJobPhoto(job.id, uri, kind);
+    } catch (e) {
+      // a photo that never uploaded is not evidence of anything, and the
+      // landlord's completion screen will show a gap — say so now
+      setPhotos((p) => ({ ...p, [kind]: undefined }));
+      showDialog(
+        'That photo did not save',
+        `${e instanceof Error ? e.message : 'The upload failed.'}\n\nTry again — the ${kind} photo is part of the record the landlord sees.`,
+      );
+    } finally {
+      setUploading(null);
     }
   }
 
@@ -80,6 +101,20 @@ export default function TechnicianJob() {
   const canStart = job.status === 'scheduled';
   const started = job.status === 'in_progress';
   const paused = job.status === 'awaiting_parts';
+
+  const blocker = uploading
+    ? 'Saving the photo…'
+    : job.status === 'variation_pending'
+      ? 'Waiting on the landlord to approve the extra work'
+      : paused
+        ? 'Tap Resume when you are back on it'
+        : canStart
+          ? 'Tap Start job when you arrive'
+          : !started
+            ? null
+            : !photos.after
+              ? 'Add the after photo to finish the job'
+              : null;
 
   return (
     <>
@@ -178,7 +213,7 @@ export default function TechnicianJob() {
         <View style={{ marginTop: 'auto', gap: 8 }}>
           <PrimaryButton
             label="Mark job done"
-            disabled={!started || !photos.after}
+            disabled={!started || !photos.after || uploading !== null}
             loading={busy}
             onPress={() =>
               showDialog('Finish this job?', 'The landlord will be asked to confirm and pay.', [
@@ -187,11 +222,13 @@ export default function TechnicianJob() {
               ])
             }
           />
-          {!photos.after && started ? (
+          {/* Say what the button is waiting for. A disabled button with no
+              reason is how "how do I complete a job?" happens. */}
+          {blocker ? (
             <View style={{ flexDirection: 'row', gap: 6, justifyContent: 'center', alignItems: 'center' }}>
               <CheckCheck size={14} color={c.textTertiary} />
-              <Text style={{ fontSize: 12, color: c.textTertiary }}>
-                Add the after photo to finish the job
+              <Text style={{ fontSize: 12, color: c.textTertiary, textAlign: 'center' }}>
+                {blocker}
               </Text>
             </View>
           ) : null}

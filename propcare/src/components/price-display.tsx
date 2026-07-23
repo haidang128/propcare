@@ -7,7 +7,8 @@ import { formatGBP } from '@/lib/job-status';
 import { incVatCaption } from '@/lib/pricing';
 
 type Props = {
-  amount: number;
+  /** null while a "something else" request is waiting on the office's quote */
+  amount: number | null;
   /** Hero = the price-approval moment; inline = rows and cards */
   variant?: 'hero' | 'inline' | 'superseded';
   caption?: string;
@@ -19,6 +20,15 @@ type Props = {
  */
 export function PriceDisplay({ amount, variant = 'inline', caption }: Props) {
   const { colors: c } = usePalette();
+
+  // never render an unquoted job as £0.00 — that is a number nobody agreed to
+  if (amount == null) {
+    return (
+      <Text style={{ fontSize: 13, fontWeight: '700', color: c.textTertiary }}>
+        Awaiting quote
+      </Text>
+    );
+  }
 
   if (variant === 'hero') {
     const [pounds, pence] = formatGBP(amount).split('.');

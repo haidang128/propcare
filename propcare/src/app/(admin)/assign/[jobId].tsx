@@ -72,7 +72,20 @@ export default function AssignSheet() {
       {job ? (
         <View style={{ gap: 2 }}>
           <Text style={{ fontSize: 15, fontWeight: '700', color: c.text }}>
-            {job.job_type?.name} · {job.reference}
+            {job.job_type?.name}
+            {job.quantity > 1 ? ` × ${job.quantity}h` : ''} · {job.reference}
+          </Text>
+          {/* What the tenant will be offered, so the dispatcher is not guessing */}
+          <Text style={{ fontSize: 12.5, color: c.textSecondary }}>
+            {job.preferred_slot_start
+              ? `Landlord asked for ${new Date(job.preferred_slot_start).toLocaleString('en-GB', {
+                  weekday: 'short',
+                  day: '2-digit',
+                  month: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })} — the tenant gets that slot and the two days after`
+              : 'No preferred time given — the tenant will be offered tomorrow and the two days after'}
           </Text>
           {job.category === 'electrical' ? (
             <Text style={{ fontSize: 12.5, color: c.textTertiary }}>
