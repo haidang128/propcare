@@ -143,6 +143,17 @@ export default function DescribeIssue() {
                 );
               })}
             </View>
+            {/* The first hour carries the call-out, so later hours are cheaper.
+                Say so — otherwise the totals look like arbitrary arithmetic. */}
+            {selected.additional_unit_price_inc_vat != null &&
+            selected.additional_unit_price_inc_vat < selected.price_inc_vat ? (
+              <Text style={{ fontSize: 12, color: c.textTertiary, lineHeight: 17 }}>
+                {formatGBP(selected.price_inc_vat).replace('.00', '')} for the first hour — it
+                covers getting an engineer to you — then{' '}
+                {formatGBP(selected.additional_unit_price_inc_vat).replace('.00', '')} an hour after
+                that.
+              </Text>
+            ) : null}
             <Text style={{ fontSize: 12, color: c.textTertiary, lineHeight: 17 }}>
               Pick the hours up front and that&apos;s the fixed price. If it turns out to need
               longer, the engineer asks you first — you&apos;re never billed for time you

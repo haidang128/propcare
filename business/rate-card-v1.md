@@ -10,6 +10,8 @@ Status: template with London market benchmarks (July 2026). The **Proposed flat 
 3. **Out-of-hours (OOH) surcharge: 1.75× flat rate**, best-effort, tech opt-in pool. OOH = before 8am, after 6pm, weekends, bank holidays. **Only emergency lines are OOH-bookable** (currently P10) — enforced per job type in the database, not just hidden in the UI.
 4. **No VAT** shown while unregistered (see compliance checklist). Rates are inclusive prices to the landlord.
 5. **Variation trigger:** if on-site scope exceeds the job definition below, technician flags a variation in the app before proceeding. The scope column is the contract — keep it tight.
+6. **Hourly lines (H1, E5) are bought by the hour up front: £95 for the first, £70 for each one after** (CEO decision 23/07/2026, migration 0019). The first hour carries the call-out — travel, parking, the trip itself; later hours carry only time, and £95 for a fourth consecutive hour sat above the market band this line is written for. Margin improves with length because the £25 platform overhead is per job, not per hour: 1hr = −£1.25, 2hr = £16.25, 3hr = £33.75. Going beyond the hours booked is still a variation the landlord approves first.
+   > ⚠️ **E5 is the line to watch.** A continuation hour pays a NICEIC electrician £52.50, below the £60–£64 this card pays them on E1/E2 — it may get declined. Set E5's continuation rate higher on its own (`job_types.additional_unit_price_inc_vat`) if electricians push back.
 
 ## Plumbing
 
@@ -30,7 +32,7 @@ Status: template with London market benchmarks (July 2026). The **Proposed flat 
 
 | # | Job | Scope | London benchmark | Proposed flat rate | Tech payout (@75%) |
 |---|---|---|---|---|---|
-| H1 | General handyman hour | First hour, any small task. Beyond the hour = variation | £45–£70/hr | £95 | £71 |
+| H1 | General handyman hour | First hour, any small task. Further hours bought up front at £70 (see principle 6) | £45–£70/hr | £95 first hr, then £70/hr | £71 / £52.50 |
 | H2 | Shelf / TV bracket mount | 1 item, standard wall, fixings incl. | £60–£100 | £85 | £64 |
 | H3 | Internal door adjustment | Ease/plane/rehang 1 door, adjust hinges | £60–£110 | £85 | £64 |
 | H4 | Lock replacement | Like-for-like euro cylinder or nightlatch (**landlord supplies the lock**) | £70–£130 | £95 | £71 |
@@ -46,7 +48,7 @@ Status: template with London market benchmarks (July 2026). The **Proposed flat 
 | E2 | Light switch replacement | Like-for-like, 1 switch | £55–£85 | £80 | £60 |
 | E3 | Light fitting replacement | Fit landlord/PropCare-supplied fitting, 1 point | £60–£120 | £95 | £71 |
 | E4 | Extractor fan replacement | Like-for-like, existing wiring/ducting | £100–£180 | £140 | £105 |
-| E5 | Fault-find first hour | Diagnose tripping/dead circuit; quote follow-up as variation | £60–£100/hr | £95 first hr | £71 |
+| E5 | Fault-find first hour | Diagnose tripping/dead circuit; further hours bought up front at £70 (see principle 6) | £60–£100/hr | £95 first hr, then £70/hr | £71 / £52.50 |
 | E6 | **EICR (1–3 bed)** | Full inspection + certificate | £150–£250 | £185 | £139 |
 
 > **E6 is strategic:** landlords legally need an EICR every 5 years. It gets you into the property, into the maintenance record, and creates a renewal reminder — the same recurring hook as CP12 when gas launches post-gate.

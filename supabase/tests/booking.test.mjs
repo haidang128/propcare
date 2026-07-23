@@ -16,7 +16,9 @@ const prop=(await j(await fetch(`${URL}/rest/v1/properties`,{method:'POST',heade
 const t=await j(await fetch(`${URL}/auth/v1/token?grant_type=password`,{method:'POST',headers:{apikey:ANON,'Content-Type':'application/json'},body:JSON.stringify({email,password:'Probe!12345'})}));
 const UH={apikey:ANON,Authorization:`Bearer ${t.access_token}`,'Content-Type':'application/json'};
 
-const hourly=(await j(await fetch(`${URL}/rest/v1/job_types?active=eq.true&unit=eq.hour&select=id,name,price_inc_vat,category&limit=1`,{headers:SH})))[0];
+const hourly=(await j(await fetch(`${URL}/rest/v1/job_types?active=eq.true&unit=eq.hour&select=id,name,price_inc_vat,additional_unit_price_inc_vat,category&limit=1`,{headers:SH})))[0];
+// each hour after the first has its own price (0019); null means repeat the first
+const laterHour=Number(hourly.additional_unit_price_inc_vat ?? hourly.price_inc_vat);
 const quote=(await j(await fetch(`${URL}/rest/v1/job_types?active=eq.true&requires_quote=eq.true&select=id,name,price_inc_vat,category&limit=1`,{headers:SH})))[0];
 const flat=(await j(await fetch(`${URL}/rest/v1/job_types?active=eq.true&unit=eq.job&requires_quote=eq.false&select=id,name,price_inc_vat,category&limit=1`,{headers:SH})))[0];
 console.log(`hourly: ${hourly.name} £${hourly.price_inc_vat} | quote: ${quote.name} | flat: ${flat.name} £${flat.price_inc_vat}\n`);
@@ -29,9 +31,18 @@ const book=async(type,body={})=>{
   return [r.status,row,b];
 };
 
-// 1. hours multiply the price, server-side
+// 1. extra hours are priced server-side: first hour + continuation rate
+const expect2=Number(hourly.price_inc_vat)+laterHour;
 const [,h2]=await book(hourly,{quantity:2,agreed_price_inc_vat:1});
-ck('2 hours costs twice the hourly line', h2 && Number(h2.agreed_price_inc_vat)===Number(hourly.price_inc_vat)*2, h2?`£${h2.agreed_price_inc_vat} for ${h2.quantity}h`:'-');
+ck('2 hours = first hour + one continuation hour', h2 && Number(h2.agreed_price_inc_vat)===expect2, h2?`£${h2.agreed_price_inc_vat} for ${h2.quantity}h (expected £${expect2})`:'-');
+
+// 3 hours proves it compounds rather than just adding one flat step
+const expect3=Number(hourly.price_inc_vat)+laterHour*2;
+const [,h3]=await book(hourly,{quantity:3});
+ck('3 hours adds a second continuation hour', h3 && Number(h3.agreed_price_inc_vat)===expect3, h3?`£${h3.agreed_price_inc_vat} (expected £${expect3})`:'-');
+
+// the continuation rate must actually be the cheaper one, or 0019 never landed
+ck('later hours cost less than the first', laterHour<Number(hourly.price_inc_vat), `first £${hourly.price_inc_vat}, later £${laterHour}`);
 
 // 2. a client-supplied quantity cannot inflate a flat-price line
 const [,f5]=await book(flat,{quantity:5,agreed_price_inc_vat:1});
